@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ public class StartActivity extends AppCompatActivity {
     private NestedScrollView nestedScrollView;
     private Button events;
     private String NameofEvents[] = {"first","second","third","fourth","fifth"};
+    private String newEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +82,38 @@ public class StartActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
-            AlertDialog.Builder eventName = new AlertDialog.Builder(this);
-            eventName.setView(R.layout.dialog_add_name);
-            AlertDialog dialog = eventName.create();
-            dialog.show();
+            setName();
             return true;
         }
         else
         return super.onOptionsItemSelected(item);
     }
+
+    public void setName()
+    {
+        AlertDialog.Builder eventName = new AlertDialog.Builder(this);
+        eventName.setView(R.layout.dialog_add_name);
+        final AlertDialog dialog = eventName.create();
+        dialog.show();
+
+        Button okay =(Button) dialog.findViewById(R.id.okay),cancel = (Button) dialog.findViewById(R.id.cancel);
+
+        okay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText nameOfEvent = (EditText) dialog.findViewById(R.id.eventName);
+                newEntry = nameOfEvent.getText().toString();
+                Log.d("new Entry",newEntry);
+                dialog.dismiss();
+                startActivity(new Intent(getApplicationContext(),addItem.class));
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+
 }
