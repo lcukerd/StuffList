@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="lcukerd.com.stufflist.StartActivity">
+
+    <item
+        android:title="add"
+        android:orderInCategory="103"
+        android:id="@+id/action_add"
+        app:showAsAction="always"
+        android:icon="@android:drawable/ic_input_add" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="104"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>
