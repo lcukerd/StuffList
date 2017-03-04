@@ -4,7 +4,11 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,8 +27,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -32,6 +45,9 @@ public class StartActivity extends AppCompatActivity {
     private Button events;
     private String NameofEvents[] = {"first","second","third","fourth","fifth"};
     private String newEntry;
+    private eventDBcontract dBcontract = new eventDBcontract(this);
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +58,10 @@ public class StartActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
+
+        writetoDB();
+        readfromDB();
+
         setContentView(R.layout.activity_start);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,6 +134,33 @@ public class StartActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+    }
+    void writetoDB()
+    {
+        SQLiteDatabase db = dBcontract.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(eventDBcontract.ListofItem.columnName,"checking2");
+        values.put(eventDBcontract.ListofItem.columntaken,"1");
+
+        long newRowId = db.insert(eventDBcontract.ListofItem.tableName,null,values);
+        Log.d("P.K of stuff",Long.toString(newRowId));
+    }
+    void readfromDB()
+    {
+        SQLiteDatabase db = dBcontract.getReadableDatabase();
+        String[] projection = {
+                eventDBcontract.ListofItem.columnID,
+                eventDBcontract.ListofItem.columnName,
+                eventDBcontract.ListofItem.columntaken,
+                eventDBcontract.ListofItem.columnreturn
+        };
+
+        Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,null,null,null);
+        while(cursor.moveToNext())
+        {
+            Log.d("column return",cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName)));
+        }
+
     }
 
 }
