@@ -12,10 +12,12 @@ public class eventDBcontract extends SQLiteOpenHelper{
 
      private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + ListofItem.tableName + " (" +
-                    ListofItem.columnID+ " INTEGER PRIMARY KEY," +
+                    ListofItem.columnID + " INTEGER PRIMARY KEY," +
+                    ListofItem.columnEvent + " TEXT, " +
+                    ListofItem.columnName + " TEXT, " +
                     ListofItem.columntaken + " INTEGER," +
                     ListofItem.columnreturn + " INTEGER, " +
-                    ListofItem.columnName + " TEXT );";
+                    ListofItem.columnFileloc + " TEXT );";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ListofItem.tableName;
@@ -39,51 +41,10 @@ public class eventDBcontract extends SQLiteOpenHelper{
     {
         public static final String tableName = "List_of_Item",
                 columnID="ID",
+                columnEvent = "Name_of_event",
                 columntaken = "Item_taken",
                 columnreturn = "Item_brought_back",
-                columnName = "Name_of_Item";
+                columnName = "Name_of_Item",
+                columnFileloc = "File_Location";
     }
-
-/*    void saveImage(Context context)
-    {
-        String filename = "myfile";
-        String string = "Hello world!";
-        FileOutputStream outputStream;
-        byte b;
-
-        String ret = "";
-
-        try {
-            outputStream = openFileOutput("try.txt", Context.MODE_PRIVATE);
-            outputStream.write(string.getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            InputStream inputStream = context.openFileInput("check");
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-                Log.d("message is",ret);
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-    }
-*/
 }

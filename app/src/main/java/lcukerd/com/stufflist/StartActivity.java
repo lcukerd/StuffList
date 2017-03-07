@@ -59,7 +59,6 @@ public class StartActivity extends AppCompatActivity {
     {
         super.onStart();
 
-        writetoDB();
         readfromDB();
 
         setContentView(R.layout.activity_start);
@@ -123,9 +122,10 @@ public class StartActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText nameOfEvent = (EditText) dialog.findViewById(R.id.eventName);
                 newEntry = nameOfEvent.getText().toString();
-                Log.d("new Entry",newEntry);
                 dialog.dismiss();
-                startActivity(new Intent(getApplicationContext(),addItem.class));
+                Intent addItem = new Intent(getApplicationContext(),addItem.class);
+                addItem.putExtra("eventName",newEntry);
+                startActivity(addItem);
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -135,30 +135,22 @@ public class StartActivity extends AppCompatActivity {
             }
         });
     }
-    void writetoDB()
-    {
-        SQLiteDatabase db = dBcontract.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(eventDBcontract.ListofItem.columnName,"checking2");
-        values.put(eventDBcontract.ListofItem.columntaken,"1");
-
-        long newRowId = db.insert(eventDBcontract.ListofItem.tableName,null,values);
-        Log.d("P.K of stuff",Long.toString(newRowId));
-    }
     void readfromDB()
     {
         SQLiteDatabase db = dBcontract.getReadableDatabase();
         String[] projection = {
                 eventDBcontract.ListofItem.columnID,
+                eventDBcontract.ListofItem.columnEvent,
                 eventDBcontract.ListofItem.columnName,
                 eventDBcontract.ListofItem.columntaken,
-                eventDBcontract.ListofItem.columnreturn
+                eventDBcontract.ListofItem.columnreturn,
+                eventDBcontract.ListofItem.columnFileloc
         };
 
         Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,null,null,null);
         while(cursor.moveToNext())
         {
-            Log.d("column return",cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName)));
+            Log.d("column return",cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc)));
         }
 
     }
