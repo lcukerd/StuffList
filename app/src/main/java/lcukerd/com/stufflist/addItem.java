@@ -1,9 +1,14 @@
 package lcukerd.com.stufflist;
+/*
+pic disappears after switching app.
+add on screen button to go back
+ */
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,8 +29,10 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOError;
 import java.io.IOException;
+import java.net.URI;
 
 public class addItem extends AppCompatActivity {
 
@@ -65,10 +72,10 @@ public class addItem extends AppCompatActivity {
         Simage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);                   //add option to save values of widget in layout
                 if (startCamera.resolveActivity(getPackageManager())!=null)
                 {
-                    File photoFile = null;
+                   ph= null;
                     try{
                         photoFile = createImageFile();
                     }
@@ -154,9 +161,27 @@ public class addItem extends AppCompatActivity {
             {
 
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+                File image = new File(new URI(getRealPathFromURI(this,photoURI)));
+                photo = Bitmap.createScaledBitmap(photo,720,1280,false);
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(image);
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 Simage.setImageBitmap(Bitmap.createScaledBitmap(photo, Simage.getMeasuredWidth(), Simage.getMeasuredHeight(), false));      // Image gets cropped look into it
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -164,6 +189,20 @@ public class addItem extends AppCompatActivity {
         }
 
 
+    }
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     private File createImageFile() throws IOException

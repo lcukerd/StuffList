@@ -43,9 +43,10 @@ public class StartActivity extends AppCompatActivity {
 
     private NestedScrollView nestedScrollView;
     private Button events;
-    private String NameofEvents[] = {"first","second","third","fourth","fifth"};
+    private String NameofEvents[];
     private String newEntry;
     private eventDBcontract dBcontract = new eventDBcontract(this);
+    private LinearLayout linearLayout;
 
 
 
@@ -58,28 +59,15 @@ public class StartActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
-
-        readfromDB();
-
         setContentView(R.layout.activity_start);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         nestedScrollView = (NestedScrollView) findViewById(R.id.startScroll);
-        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        for (int i=0;i<NameofEvents.length;i++)
-        {
-            events = new Button(this);
-            events.setGravity(View.TEXT_DIRECTION_LTR);
-            events.setText(NameofEvents[i]);
-            linearLayout.addView(events);
-            events.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // start next activity
-                }
-            });
-        }
+
+        readfromDB();
+
         nestedScrollView.addView(linearLayout);
     }
 
@@ -152,7 +140,36 @@ public class StartActivity extends AppCompatActivity {
         {
             Log.d("column return",cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc)));
         }
+        cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,eventDBcontract.ListofItem.columnEvent,null,null);
+        int i=0;
+        NameofEvents = new String[cursor.getCount()];
+        while(cursor.moveToNext())
+        {
+            NameofEvents[i] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent));
+            i++;
+        }
+        UpdateScrollView();
 
     }
+    private void UpdateScrollView()
+    {
+        for (int i=0;i<NameofEvents.length;i++)
+        {
+            events = new Button(this);
+            events.setGravity(View.TEXT_DIRECTION_LTR);
+            events.setText(NameofEvents[i]);
+            linearLayout.addView(events);
+            final int ch=i;
+            events.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(),showList.class);
+                    intent.putExtra("Event_Name",NameofEvents[ch]);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
 
 }
