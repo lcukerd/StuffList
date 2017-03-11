@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -98,17 +100,19 @@ public class StartActivity extends AppCompatActivity {
 
     public void setName()
     {
-        AlertDialog.Builder eventName = new AlertDialog.Builder(this);
+        AlertDialog.Builder eventName = new AlertDialog.Builder(this,R.style.dialogStyle);
         eventName.setView(R.layout.dialog_add_name);
         final AlertDialog dialog = eventName.create();
         dialog.show();
+        final InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
         Button okay =(Button) dialog.findViewById(R.id.okay),cancel = (Button) dialog.findViewById(R.id.cancel);
+        final EditText nameOfEvent = (EditText) dialog.findViewById(R.id.eventName);
 
         okay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText nameOfEvent = (EditText) dialog.findViewById(R.id.eventName);
                 newEntry = nameOfEvent.getText().toString();
                 dialog.dismiss();
                 Intent addItem = new Intent(getApplicationContext(),addItem.class);
@@ -119,6 +123,8 @@ public class StartActivity extends AppCompatActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                nameOfEvent.clearFocus();
+                imm.hideSoftInputFromWindow(nameOfEvent.getWindowToken(), 0);
                 dialog.dismiss();
             }
         });

@@ -1,0 +1,6 @@
+<resources>
+    <style name="dialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!--dialog background-->
+        <item name="android:windowBackground">@drawable/drawable</item>
+    </style>
+</resources>

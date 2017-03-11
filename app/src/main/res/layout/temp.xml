@@ -46,7 +46,7 @@
                 android:layout_alignBaseline="@+id/returned"
                 android:layout_alignBottom="@+id/returned"
                 android:layout_alignParentEnd="true"
-                android:text="TextView" />
+                android:hint="Dunno what its called :)" />
 
             <ImageView
                 android:id="@+id/imageView"
