@@ -2,6 +2,8 @@ package lcukerd.com.stufflist;
 /*
 pic disappears after switching app.
 add on screen button to go back
+text data in edittext disappears if clicked on add image after writing event name
+Remove image from gallery
  */
 
 import android.app.Activity;
@@ -49,6 +51,7 @@ public class addItem extends AppCompatActivity {
     private Boolean updateImage = false;
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private String eventName;
+    File photoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,7 @@ public class addItem extends AppCompatActivity {
                 Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);                   //add option to save values of widget in layout
                 if (startCamera.resolveActivity(getPackageManager())!=null)
                 {
-                   ph= null;
+                   photoFile= null;
                     try{
                         photoFile = createImageFile();
                     }
@@ -161,13 +164,17 @@ public class addItem extends AppCompatActivity {
             {
 
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                File image = new File(new URI(getRealPathFromURI(this,photoURI)));
-                photo = Bitmap.createScaledBitmap(photo,720,1280,false);
+                photoFile.delete();
+                File image = createImageFile();
+                photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",image);
+                if (photo.getWidth()<photo.getHeight())
+                    photo = Bitmap.createScaledBitmap(photo,720,1280,false);
+                else
+                    photo = Bitmap.createScaledBitmap(photo,1280,720,false);
                 FileOutputStream out = null;
                 try {
                     out = new FileOutputStream(image);
-                    photo.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-                    // PNG is a lossless format, the compression factor (100) is ignored
+                    photo.compress(Bitmap.CompressFormat.PNG, 100, out);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -179,7 +186,7 @@ public class addItem extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Simage.setImageBitmap(Bitmap.createScaledBitmap(photo, Simage.getMeasuredWidth(), Simage.getMeasuredHeight(), false));      // Image gets cropped look into it
+                Simage.setImageBitmap(photo);      // Image gets cropped look into it
             }
             catch (Exception e)
             {

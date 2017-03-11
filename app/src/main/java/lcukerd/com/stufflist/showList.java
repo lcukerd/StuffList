@@ -88,7 +88,7 @@ public class showList extends AppCompatActivity {
 
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoURI));
                     Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
-                    Eimage.setImageBitmap(Bitmap.createScaledBitmap(photo,720,1280,false));      // Image gets cropped look into it
+                    Eimage.setImageBitmap(photo);      // Image gets cropped look into it
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
