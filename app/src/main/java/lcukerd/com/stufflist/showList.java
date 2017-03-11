@@ -1,46 +1,21 @@
 package lcukerd.com.stufflist;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.IntRange;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
+import android.widget.CheckBox;;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-
 import java.io.IOException;
-import java.util.ArrayList;
-
-import static android.R.drawable.ic_input_add;
-import static android.graphics.Color.BLUE;
-import static android.graphics.Color.RED;
-import static android.graphics.Color.rgb;
 
 public class showList extends AppCompatActivity {
 
@@ -53,20 +28,15 @@ public class showList extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-
-
         Intent intent = getIntent();
         data = intent.getStringExtra("Event_Name");
-        Log.d("Event Name",data);
-
     }
     protected void onResume()
     {
-        Log.d("on resume","running");
         super.onResume();
         setContentView(R.layout.activity_show_list);
-
         linearLayout = (LinearLayout) findViewById(R.id.linear);
 
         readDB(data);
@@ -79,24 +49,21 @@ public class showList extends AppCompatActivity {
             final String photoURI = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc));
             final String name = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
             final String id = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
+
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(),addItem.class);
                     intent.putExtra("eventName",data);
                     intent.putExtra("calledby","list");
-                    intent.putExtra("available data",new String[]{name,
-                            ct,
-                            rt,
-                            photoURI,
-                            id});
+                    intent.putExtra("available data",new String[]{ name , ct , rt , photoURI , id });
                     startActivity(intent);
                 }
             });
+
             TextView Ename = (TextView) v.findViewById(R.id.textView);
             CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
             ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
-
 
             Ename.setText(name);
 
@@ -108,6 +75,7 @@ public class showList extends AppCompatActivity {
                 returned.setChecked(true);
             else
                 returned.setChecked(false);
+
             if(photoURI!=null) {
                 try {
 
@@ -126,11 +94,6 @@ public class showList extends AppCompatActivity {
     {
         SQLiteDatabase db = dBcontract.getReadableDatabase();
         String q = "Select * From "+eventDBcontract.ListofItem.tableName+" where "+eventDBcontract.ListofItem.columnEvent+" = '"+event+"'";
-        Log.d("Query ", q);
         cursor = db.rawQuery(q,null);
-
-
     }
-
-
 }

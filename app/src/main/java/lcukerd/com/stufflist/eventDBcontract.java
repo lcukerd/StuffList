@@ -19,8 +19,6 @@ public class eventDBcontract extends SQLiteOpenHelper{
                     ListofItem.columnreturn + " INTEGER, " +
                     ListofItem.columnFileloc + " TEXT );";
 
-    private static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + ListofItem.tableName;
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Stuff.db";
 

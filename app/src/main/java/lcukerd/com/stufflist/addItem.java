@@ -14,12 +14,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,13 +27,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOError;
 import java.io.IOException;
-import java.net.URI;
 
 public class addItem extends AppCompatActivity {
 
@@ -46,7 +40,6 @@ public class addItem extends AppCompatActivity {
 
     private Bitmap photo=null;
     private static final int CAMERA_REQUEST = 1004;
-    private String currentPhotoPath;
     private Context context = this;
     private Uri photoURI;
     private Boolean updateImage = false;
@@ -66,9 +59,6 @@ public class addItem extends AppCompatActivity {
         add = getIntent();
         eventName = add.getStringExtra("eventName");
         caller = add.getStringExtra("calledby");
-
-
-
     }
     protected void onStart()
     {
@@ -124,7 +114,7 @@ public class addItem extends AppCompatActivity {
                     r=1;
                 else
                     r=0;
-                Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);                   //add option to save values of widget in layout
+                Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (startCamera.resolveActivity(getPackageManager())!=null)
                 {
                    photoFile= null;
@@ -158,10 +148,7 @@ public class addItem extends AppCompatActivity {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (caller.equals("main"))
-                    save();
-                else
-                    update();
+                save();;
                 camerastarted=false;
                 Sname.setText("");
                 taken.setChecked(false);
@@ -182,7 +169,7 @@ public class addItem extends AppCompatActivity {
         ContentValues values = new ContentValues();
 
         values.put(eventDBcontract.ListofItem.columnEvent,eventName);
-        values.put(eventDBcontract.ListofItem.columnName,Sname.getText().toString());               //not save null when nothing written instead saves nothing
+        values.put(eventDBcontract.ListofItem.columnName,Sname.getText().toString());
         if (taken.isChecked()==true)
             values.put(eventDBcontract.ListofItem.columntaken,"1");
         else
@@ -195,32 +182,10 @@ public class addItem extends AppCompatActivity {
             values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
             Log.d("File address write", photoURI.toString());
         }
-        long newRowId = db.insert(eventDBcontract.ListofItem.tableName,null,values);
-        Log.d("P.K of stuff",Long.toString(newRowId));
-
-    }
-    private void update()
-    {
-        SQLiteDatabase db = dBcontract.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(eventDBcontract.ListofItem.columnEvent,eventName);
-        values.put(eventDBcontract.ListofItem.columnName,Sname.getText().toString());               //not save null when nothing written instead saves nothing
-        if (taken.isChecked()==true)
-            values.put(eventDBcontract.ListofItem.columntaken,"1");
+        if (caller.equals("main"))
+            db.insert(eventDBcontract.ListofItem.tableName,null,values);
         else
-            values.put(eventDBcontract.ListofItem.columntaken,"0");
-        if (returned.isChecked()==true)
-            values.put(eventDBcontract.ListofItem.columnreturn,"1");
-        else
-            values.put(eventDBcontract.ListofItem.columnreturn,"0");
-        if (photoURI!=null) {
-            values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
-            Log.d("File address write", photoURI.toString());
-        }
-        long newRowId = db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
-        Log.d("P.K of stuff",Long.toString(newRowId));
-
+            db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
     }
 
     protected void onActivityResult(int requestCode,int resultCode,Intent data)
@@ -246,7 +211,6 @@ public class addItem extends AppCompatActivity {
         {
             try
             {
-
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                 photoFile.delete();
                 File image = createImageFile();
@@ -307,11 +271,9 @@ public class addItem extends AppCompatActivity {
 
     private File createImageFile() throws IOException
     {
-        String EName = "nothing for now";
-        String itr = "1";                                   //remember to change this in case of conflicts
+        String EName = "Stuff";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(EName+"_"+itr,".jpg",storageDir);
-        currentPhotoPath = image.getAbsolutePath();
+        File image = File.createTempFile(EName,".jpg",storageDir);
         return image;
     }
 
