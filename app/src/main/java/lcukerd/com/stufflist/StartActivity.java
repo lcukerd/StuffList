@@ -44,9 +44,6 @@ import java.util.List;
 public class StartActivity extends AppCompatActivity {
 
     private NestedScrollView nestedScrollView;
-    private Button events;
-    private String NameofEvents[];
-    private String newEntry;
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private LinearLayout linearLayout;
 
@@ -84,18 +81,14 @@ public class StartActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
             setName();
             return true;
         }
         else
-        return super.onOptionsItemSelected(item);
+            return super.onOptionsItemSelected(item);
     }
 
     public void setName()
@@ -113,10 +106,15 @@ public class StartActivity extends AppCompatActivity {
         okay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                newEntry = nameOfEvent.getText().toString();
+                String newEntry = nameOfEvent.getText().toString();
+                nameOfEvent.clearFocus();
+                imm.hideSoftInputFromWindow(nameOfEvent.getWindowToken(), 0);
                 dialog.dismiss();
+
                 Intent addItem = new Intent(getApplicationContext(),addItem.class);
                 addItem.putExtra("eventName",newEntry);
+                addItem.putExtra("calledby","main");
+                finish();
                 startActivity(addItem);
             }
         });
@@ -147,18 +145,20 @@ public class StartActivity extends AppCompatActivity {
             Log.d("column return",cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))+" "+cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc)));
         }
         cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,eventDBcontract.ListofItem.columnEvent,null,null);
+
         int i=0;
-        NameofEvents = new String[cursor.getCount()];
+        String NameofEvents[] = new String[cursor.getCount()];
         while(cursor.moveToNext())
         {
             NameofEvents[i] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent));
             i++;
         }
-        UpdateScrollView();
+        UpdateScrollView(NameofEvents);
 
     }
-    private void UpdateScrollView()
+    private void UpdateScrollView(final String NameofEvents[])
     {
+        Button events;
         for (int i=0;i<NameofEvents.length;i++)
         {
             events = new Button(this);

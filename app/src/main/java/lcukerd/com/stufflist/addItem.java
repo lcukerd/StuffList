@@ -4,6 +4,7 @@ pic disappears after switching app.
 add on screen button to go back
 text data in edittext disappears if clicked on add image after writing event name
 Remove image from gallery
+image not saved if rotated while closing camera
  */
 
 import android.app.Activity;
@@ -51,13 +52,22 @@ public class addItem extends AppCompatActivity {
     private Boolean updateImage = false;
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private String eventName;
-    File photoFile;
+    private Boolean camerastarted = false;
+    private String ItemName;
+    private int t,r;
+    private File photoFile;
+    private String caller;
+    private Intent add;
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent add = getIntent();
+        add = getIntent();
         eventName = add.getStringExtra("eventName");
+        caller = add.getStringExtra("calledby");
+
+
 
     }
     protected void onStart()
@@ -72,9 +82,48 @@ public class addItem extends AppCompatActivity {
         finish = (Button) findViewById(R.id.finish);
         more = (Button) findViewById(R.id.more);
 
+        if (caller.equals("list"))
+        {
+            String info[] = add.getStringArrayExtra("available data");
+            Sname.setText(info[0]);
+            if (info[1].equals("1"))
+                taken.setChecked(true);
+            else
+                taken.setChecked(false);
+            if (info[2].equals("1"))
+                returned.setChecked(true);
+            else
+                returned.setChecked(false);
+            if (info[3]!=null)
+            {
+                try {
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(info[3]));
+                    Simage.setImageBitmap(photo);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            id = info[4];
+            ViewGroup layout =(ViewGroup) finish.getParent();
+            layout.removeView(finish);
+            more.setText("Update");
+        }
+
+
         Simage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ItemName = Sname.getText().toString();
+                if (taken.isChecked())
+                    t=1;
+                else
+                    t=0;
+                if (returned.isChecked())
+                    r=1;
+                else
+                    r=0;
                 Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);                   //add option to save values of widget in layout
                 if (startCamera.resolveActivity(getPackageManager())!=null)
                 {
@@ -90,6 +139,7 @@ public class addItem extends AppCompatActivity {
                     {
                         photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
                         startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
+                        camerastarted=true;
                         startActivityForResult(startCamera,CAMERA_REQUEST);
                     }
                 }
@@ -100,19 +150,30 @@ public class addItem extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 save();
+                camerastarted=false;
+                finish();
                 startActivity(new Intent(getApplicationContext(),StartActivity.class));
             }
         });
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save();
+                if (caller.equals("main"))
+                    save();
+                else
+                    update();
+                camerastarted=false;
                 Sname.setText("");
                 taken.setChecked(false);
                 returned.setChecked(false);
-                recreate();
+                if (caller.equals("main"))
+                    recreate();
+                else
+                    finish();
             }
         });
+        if (camerastarted==true)
+            onWindowFocusChanged(true);
 
     }
     private void save()
@@ -135,6 +196,29 @@ public class addItem extends AppCompatActivity {
             Log.d("File address write", photoURI.toString());
         }
         long newRowId = db.insert(eventDBcontract.ListofItem.tableName,null,values);
+        Log.d("P.K of stuff",Long.toString(newRowId));
+
+    }
+    private void update()
+    {
+        SQLiteDatabase db = dBcontract.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(eventDBcontract.ListofItem.columnEvent,eventName);
+        values.put(eventDBcontract.ListofItem.columnName,Sname.getText().toString());               //not save null when nothing written instead saves nothing
+        if (taken.isChecked()==true)
+            values.put(eventDBcontract.ListofItem.columntaken,"1");
+        else
+            values.put(eventDBcontract.ListofItem.columntaken,"0");
+        if (returned.isChecked()==true)
+            values.put(eventDBcontract.ListofItem.columnreturn,"1");
+        else
+            values.put(eventDBcontract.ListofItem.columnreturn,"0");
+        if (photoURI!=null) {
+            values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
+            Log.d("File address write", photoURI.toString());
+        }
+        long newRowId = db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
         Log.d("P.K of stuff",Long.toString(newRowId));
 
     }
@@ -187,6 +271,15 @@ public class addItem extends AppCompatActivity {
                     }
                 }
                 Simage.setImageBitmap(photo);      // Image gets cropped look into it
+                Sname.setText(ItemName);
+                if (t==1)
+                    taken.setChecked(true);
+                else
+                    taken.setChecked(false);
+                if (r==1)
+                    returned.setChecked(true);
+                else
+                    returned.setChecked(false);
             }
             catch (Exception e)
             {
