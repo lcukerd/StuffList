@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:key="pref_event_order"
+        android:title="@string/order_title"
+        android:entries="@array/order_choices"
+        android:entryValues="@array/order_values_event"
+        android:defaultValue="@string/defaultvae"/>
+</PreferenceScreen>

@@ -17,7 +17,8 @@ public class eventDBcontract extends SQLiteOpenHelper{
                     ListofItem.columnName + " TEXT, " +
                     ListofItem.columntaken + " INTEGER," +
                     ListofItem.columnreturn + " INTEGER, " +
-                    ListofItem.columnFileloc + " TEXT );";
+                    ListofItem.columnFileloc + " TEXT, " +
+                    ListofItem.columndatetime + " INTEGER );";
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Stuff.db";
@@ -43,6 +44,7 @@ public class eventDBcontract extends SQLiteOpenHelper{
                 columntaken = "Item_taken",
                 columnreturn = "Item_brought_back",
                 columnName = "Name_of_Item",
-                columnFileloc = "File_Location";
+                columnFileloc = "File_Location",
+                columndatetime = "Creation_millisec";
     }
 }

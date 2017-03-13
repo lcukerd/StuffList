@@ -13,5 +13,7 @@
         android:id="@+id/action_settings"
         android:orderInCategory="104"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        />
+
 </menu>

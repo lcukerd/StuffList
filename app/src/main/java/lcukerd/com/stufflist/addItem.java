@@ -5,7 +5,7 @@ add on screen button to go back
 text data in edittext disappears if clicked on add image after writing event name
 Remove image from gallery
 image not saved if rotated while closing camera
- */
+*/
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -52,6 +52,7 @@ public class addItem extends AppCompatActivity {
     private String caller;
     private Intent add;
     private String id;
+    private DBinteract interact = new DBinteract(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,16 +140,15 @@ public class addItem extends AppCompatActivity {
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save();
+                interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
                 camerastarted=false;
                 finish();
-                startActivity(new Intent(getApplicationContext(),StartActivity.class));
             }
         });
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save();;
+                interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
                 camerastarted=false;
                 Sname.setText("");
                 taken.setChecked(false);
@@ -163,30 +163,7 @@ public class addItem extends AppCompatActivity {
             onWindowFocusChanged(true);
 
     }
-    private void save()
-    {
-        SQLiteDatabase db = dBcontract.getWritableDatabase();
-        ContentValues values = new ContentValues();
 
-        values.put(eventDBcontract.ListofItem.columnEvent,eventName);
-        values.put(eventDBcontract.ListofItem.columnName,Sname.getText().toString());
-        if (taken.isChecked()==true)
-            values.put(eventDBcontract.ListofItem.columntaken,"1");
-        else
-            values.put(eventDBcontract.ListofItem.columntaken,"0");
-        if (returned.isChecked()==true)
-            values.put(eventDBcontract.ListofItem.columnreturn,"1");
-        else
-            values.put(eventDBcontract.ListofItem.columnreturn,"0");
-        if (photoURI!=null) {
-            values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
-            Log.d("File address write", photoURI.toString());
-        }
-        if (caller.equals("main"))
-            db.insert(eventDBcontract.ListofItem.tableName,null,values);
-        else
-            db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
-    }
 
     protected void onActivityResult(int requestCode,int resultCode,Intent data)
     {
