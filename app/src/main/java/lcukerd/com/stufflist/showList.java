@@ -5,12 +5,16 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,15 +24,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import java.io.IOException;
 
 public class showList extends AppCompatActivity {
 
-    private LinearLayout linearLayout;
+    private TableLayout tableLayout;
     private View v;
     private CardView cardView;
     private Cursor cursor;
@@ -53,13 +60,38 @@ public class showList extends AppCompatActivity {
 
         setContentView(R.layout.activity_show_list);
         getSupportActionBar().setTitle(data);
-        linearLayout = (LinearLayout) findViewById(R.id.linear);
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33ff4444")));
+        tableLayout = (TableLayout) findViewById(R.id.table);
+        int i=1;
+        TableRow row = new TableRow(this);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int columns,w,h;
 
+        if (metrics.heightPixels>=metrics.widthPixels)
+        {
+            columns=2;
+            w= metrics.widthPixels/columns;
+            h= metrics.heightPixels/columns;
+        }
+        else
+        {
+            columns=3;
+            h= metrics.widthPixels/columns;
+            w= metrics.widthPixels/columns;
+        }
+
+        int th,tw;
         cursor = interact.readinEvent(data,order);
 
         while(cursor.moveToNext())                                                                  // To display list
         {
-            v =  View.inflate(this,R.layout.temp,null);
+            tw = w;
+            th = h;
+            Log.d("value of i",String.valueOf(i));
+            v =  View.inflate(this,R.layout.trying,null);
+            FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+
             cardView = (CardView) v.findViewById(R.id.cardSample);
             final String ct = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken));
             final String rt = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn));
@@ -134,8 +166,32 @@ public class showList extends AppCompatActivity {
                 }
             });
 
+            if(photoURI!=null) {
+                try {
 
-            Ename.setText(name);                                                                    //adds data in card
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoURI));
+                    Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
+                    /*if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
+                    {
+                        th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
+                        Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
+                    }*/
+                    BitmapDrawable ob = new BitmapDrawable(getResources(), photo);
+                    Eimage.setBackground(ob);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d("Couldn't Load",name+" "+photoURI);
+                }
+            }
+            else
+            {
+                //not decided
+            }
+
+            frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));
+
+            if (name.equals("")==false)
+                Ename.setText(name);                                                                    //adds data in card
 
             if (ct.equals(String.valueOf(1)))
                 taken.setChecked(true);
@@ -146,18 +202,26 @@ public class showList extends AppCompatActivity {
             else
                 returned.setChecked(false);
 
-            if(photoURI!=null) {
-                try {
-
-                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoURI));
-                    Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
-                    Eimage.setImageBitmap(photo);      // Image gets cropped look into it
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (i==columns)                                                                         // adding rows
+            {
+                row.addView(v, new TableRow.LayoutParams(tw,th ));
+                tableLayout.addView(row);
+                i=1;
             }
-            linearLayout.addView(v);
+            else if (i==1)
+            {
+                row = new TableRow(this);
+                row.addView(v, new TableRow.LayoutParams( tw,th  ));
+                i++;
+            }
+            else if (i<columns)
+            {
+                row.addView(v, new TableRow.LayoutParams( tw,th   ));
+                i++;
+            }
         }
+        if (i!=1)
+            tableLayout.addView(row);
     }
     public String updateorder(String order)
     {

@@ -28,6 +28,8 @@ import android.widget.PopupWindow;
 import java.text.ParseException;
 import java.util.Date;
 
+import static android.graphics.Color.rgb;
+
 
 public class StartActivity extends AppCompatActivity {
 
@@ -145,6 +147,7 @@ public class StartActivity extends AppCompatActivity {
         for (int i=0;i<NameofEvents.length;i++)
         {
             events = new Button(this);
+
             events.setGravity(View.TEXT_DIRECTION_LTR);
             events.setText(NameofEvents[i]);
             linearLayout.addView(events);
