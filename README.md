@@ -1,3 +1,3 @@
 # StuffList
 
-Keeps track of application taken and brought back from trip
+Keeps track of items taken and brought back from trip

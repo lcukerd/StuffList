@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/taken"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="39sp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
@@ -26,7 +26,7 @@
         android:layout_alignBaseline="@+id/taken"
         android:layout_alignBottom="@+id/taken"
         android:layout_toEndOf="@+id/taken"
-        android:layout_marginStart="17dp" />
+        android:layout_marginStart="17sp" />
 
     <ImageButton
         android:id="@+id/Simage"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/Sname"
-        android:layout_marginTop="47dp"
+        android:layout_marginTop="47sp"
         android:layout_toEndOf="@+id/back"
         app:srcCompat="@android:drawable/ic_input_add"
         android:layout_above="@+id/more" />
@@ -43,13 +43,14 @@
         android:id="@+id/Sname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:hint="Name of Item"
+        android:inputType="textPersonName"
+        android:ems="15"
+        android:layout_marginEnd="19sp"
         android:layout_alignBaseline="@+id/back"
         android:layout_alignBottom="@+id/back"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="19dp"
-        android:ems="10"
-        android:hint="Name of Item"
-        android:inputType="textPersonName" />
+        android:layout_toEndOf="@+id/finish" />
 
     <Button
         android:id="@+id/more"

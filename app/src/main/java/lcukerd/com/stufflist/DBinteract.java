@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.CheckBox;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -106,18 +107,8 @@ public class DBinteract {
     }
     private long getmillis()
     {
-        long timeInMilliseconds=0;
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy, hh:mm:ss a");
-        try {
-            Date mDate = sdf.parse(currentDateTimeString);
-            timeInMilliseconds = mDate.getTime();
-            Log.d("time",String.valueOf(timeInMilliseconds));
-            return timeInMilliseconds;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return timeInMilliseconds;
+        Calendar c = Calendar.getInstance();
+        return c.getTimeInMillis();
     }
 
 }

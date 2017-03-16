@@ -22,8 +22,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -164,7 +166,21 @@ public class StartActivity extends AppCompatActivity {
                 @Override
                 public boolean onLongClick(View v) {
                     try {
-                        Log.d("Long Click","successful");
+                        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View layout = inflater.inflate(R.layout.actionbuttons,(ViewGroup)findViewById(R.id.actionButtons));
+                        PopupWindow pw = new PopupWindow(layout, 600, 600, true);
+                        int coord[]= new int[2];
+                        v.getLocationOnScreen(coord);
+                        pw.showAtLocation(v, Gravity.NO_GRAVITY, 200 ,coord[1]+100);
+
+                       /* Button add = (Button) layout.findViewById(R.id.popupadd);
+                        Button del = (Button) layout.findViewById(R.id.popupdel);
+                        Button ex = (Button) layout.findViewById(R.id.popupex);
+                        add.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
+                        del.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
+                        ex.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));*/
+
+                        /*Log.d("Long Click","successful");
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.popup,(ViewGroup)findViewById(R.id.pop));
                         PopupWindow pw = new PopupWindow(layout, 400, 200, true);
@@ -179,12 +195,13 @@ public class StartActivity extends AppCompatActivity {
                                 Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+NameofEvents[ch]+"'",null)));
                                 recreate();                                                         //add option to delete files as well
                             }
-                        });
+                        });*/
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     return true;
+
                 }
             });
         }

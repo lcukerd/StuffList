@@ -27,9 +27,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static android.widget.RelativeLayout.ALIGN_BASELINE;
+import static android.widget.RelativeLayout.ALIGN_BOTTOM;
+import static android.widget.RelativeLayout.END_OF;
 
 public class addItem extends AppCompatActivity {
 
@@ -99,6 +105,11 @@ public class addItem extends AppCompatActivity {
             id = info[4];
             ViewGroup layout =(ViewGroup) finish.getParent();
             layout.removeView(finish);
+            RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+            param.addRule(END_OF,R.id.back);
+            param.addRule(ALIGN_BASELINE,R.id.back);
+            param.addRule(ALIGN_BOTTOM,R.id.back);
+            Sname.setLayoutParams(param);
             more.setText("Update");
         }
 
