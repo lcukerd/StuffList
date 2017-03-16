@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -35,7 +36,8 @@ import java.io.IOException;
 
 public class showList extends AppCompatActivity {
 
-    private TableLayout tableLayout;
+    private GridLayout gridLayout;
+    private LinearLayout l1 , l2 , l3;
     private View v;
     private CardView cardView;
     private Cursor cursor;
@@ -61,9 +63,11 @@ public class showList extends AppCompatActivity {
         setContentView(R.layout.activity_show_list);
         getSupportActionBar().setTitle(data);
         //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33ff4444")));
-        tableLayout = (TableLayout) findViewById(R.id.table);
+        gridLayout = (GridLayout) findViewById(R.id.grid);
+
         int i=1;
-        TableRow row = new TableRow(this);
+        //TableRow row = new TableRow(this);
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int columns,w,h;
@@ -73,22 +77,40 @@ public class showList extends AppCompatActivity {
             columns=2;
             w= metrics.widthPixels/columns;
             h= metrics.heightPixels/columns;
+            gridLayout.setColumnCount(columns);
+            l1 = new LinearLayout(this);
+            l3 = new LinearLayout(this);
+            l1.setOrientation(LinearLayout.VERTICAL);
+            l3.setOrientation(LinearLayout.VERTICAL);
+            gridLayout.addView(l1);
+            gridLayout.addView(l3);
         }
         else
         {
             columns=3;
             h= metrics.widthPixels/columns;
             w= metrics.widthPixels/columns;
+            gridLayout.setColumnCount(columns);
+            l1 = new LinearLayout(this);
+            l2 = new LinearLayout(this);
+            l3 = new LinearLayout(this);
+            l1.setOrientation(LinearLayout.VERTICAL);
+            l2.setOrientation(LinearLayout.VERTICAL);
+            l3.setOrientation(LinearLayout.VERTICAL);
+            gridLayout.addView(l1);
+            gridLayout.addView(l2);
+            gridLayout.addView(l3);
         }
 
-        int th,tw;
+
+        int th,tw,c1=0,c2=0,c3=0;
         cursor = interact.readinEvent(data,order);
 
         while(cursor.moveToNext())                                                                  // To display list
         {
             tw = w;
             th = h;
-            Log.d("value of i",String.valueOf(i));
+            //Log.d("value of i",String.valueOf(i));
             v =  View.inflate(this,R.layout.trying,null);
             FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.frame);
 
@@ -171,11 +193,11 @@ public class showList extends AppCompatActivity {
 
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoURI));
                     Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
-                    /*if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
+                    if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
                     {
                         th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
                         Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
-                    }*/
+                    }
                     BitmapDrawable ob = new BitmapDrawable(getResources(), photo);
                     Eimage.setBackground(ob);
                 } catch (Exception e) {
@@ -202,26 +224,45 @@ public class showList extends AppCompatActivity {
             else
                 returned.setChecked(false);
 
+            if (columns==3) {
+                if ((c1 < c2) && (c1 < c3))
+                    i = 1;
+                else if ((c2<c1)&&(c2<c3))
+                    i = 2;
+                else if ((c3<c1)&&(c3<c2))
+                    i = 3;
+                else
+                    i = 1;
+            }
+            else if (columns==2)
+            {
+                if (c1<=c3)
+                    i = 1;
+                else
+                    i = 2;
+            }
+            //gridLayout.addView(v);
             if (i==columns)                                                                         // adding rows
             {
-                row.addView(v, new TableRow.LayoutParams(tw,th ));
-                tableLayout.addView(row);
+                c3+=th;
+                l3.addView(v);
                 i=1;
             }
             else if (i==1)
             {
-                row = new TableRow(this);
-                row.addView(v, new TableRow.LayoutParams( tw,th  ));
+                c1+=th;
+                l1.addView(v);
                 i++;
             }
             else if (i<columns)
             {
-                row.addView(v, new TableRow.LayoutParams( tw,th   ));
+                c2+=th;
+                l2.addView(v);
                 i++;
             }
         }
-        if (i!=1)
-            tableLayout.addView(row);
+        //if (i!=1)
+           // tableLayout.addView(row);
     }
     public String updateorder(String order)
     {
