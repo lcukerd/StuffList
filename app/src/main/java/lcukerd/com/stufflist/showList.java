@@ -227,10 +227,12 @@ public class showList extends AppCompatActivity {
             if (columns==3) {
                 if ((c1 < c2) && (c1 < c3))
                     i = 1;
-                else if ((c2<c1)&&(c2<c3))
+                else if ((c2 < c1) && (c2 < c3))
                     i = 2;
                 else if ((c3<c1)&&(c3<c2))
                     i = 3;
+                else if (c2 == c3)
+                    i = 2;
                 else
                     i = 1;
             }
@@ -241,7 +243,7 @@ public class showList extends AppCompatActivity {
                 else
                     i = 2;
             }
-            //gridLayout.addView(v);
+
             if (i==columns)                                                                         // adding rows
             {
                 c3+=th;
