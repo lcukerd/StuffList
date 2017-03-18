@@ -38,9 +38,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".showList"></activity>
+        <activity android:name=".showList"
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity android:name=".orderevent"></activity>
         <activity android:name=".orderitem"></activity>
+
     </application>
 
 </manifest>

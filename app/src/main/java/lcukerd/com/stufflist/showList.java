@@ -1,5 +1,8 @@
 package lcukerd.com.stufflist;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,21 +17,30 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.method.ScrollingMovementMethod;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Scroller;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -44,6 +56,8 @@ public class showList extends AppCompatActivity {
     private String data;
     private DBinteract interact = new DBinteract(this);
     private eventDBcontract dBcontract = new eventDBcontract(this);
+    private EditText notes ;
+    private String specialid = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +80,6 @@ public class showList extends AppCompatActivity {
         gridLayout = (GridLayout) findViewById(R.id.grid);
 
         int i=1;
-        //TableRow row = new TableRow(this);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -102,17 +115,40 @@ public class showList extends AppCompatActivity {
             gridLayout.addView(l3);
         }
 
+        v =  View.inflate(this,R.layout.customnote,null);
+        FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+        FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,h/3);
+        frameLayout.setLayoutParams(param);
+        notes = (EditText) v.findViewById(R.id.addnote);
+        /*notes.setScroller(new Scroller(this));
+        notes.setMaxLines(4);
+        notes.setVerticalScrollBarEnabled(true);
+        notes.setMovementMethod(new ScrollingMovementMethod());*/
+        notes.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if (view.getId() == R.id.addnote) {
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+                    switch (event.getAction()&MotionEvent.ACTION_MASK){
+                        case MotionEvent.ACTION_UP:
+                            view.getParent().requestDisallowInterceptTouchEvent(false);
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
+        l3.addView(frameLayout);
 
-        int th,tw,c1=0,c2=0,c3=0;
+        int th,tw,c1=0,c2=0,c3=h/3;
         cursor = interact.readinEvent(data,order);
 
         while(cursor.moveToNext())                                                                  // To display list
         {
             tw = w;
             th = h;
-            //Log.d("value of i",String.valueOf(i));
             v =  View.inflate(this,R.layout.trying,null);
-            FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+            frameLayout = (FrameLayout) v.findViewById(R.id.frame);
 
             cardView = (CardView) v.findViewById(R.id.cardSample);
             final String ct = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken));
@@ -121,6 +157,15 @@ public class showList extends AppCompatActivity {
             final String name = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
             final String id = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
 
+            if (name.length()>=2)
+                if ((name.charAt(0)=='#')&&(name.charAt(1)=='%'))
+                  {
+                      specialid =id;
+                      notes.setText(name.substring(2));
+                      Log.d("found special id",String.valueOf(id));
+                      continue;
+                  }
+            Log.d("id",String.valueOf(id));
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -141,7 +186,7 @@ public class showList extends AppCompatActivity {
                         PopupWindow pw = new PopupWindow(layout, 400, 200, true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
-                        pw.showAtLocation(v, Gravity.NO_GRAVITY, 700 ,coord[1]+100);
+                        pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
                         Button del = (Button) layout.findViewById(R.id.del);
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -207,7 +252,7 @@ public class showList extends AppCompatActivity {
             }
             else
             {
-                //not decided
+
             }
 
             frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));
@@ -263,8 +308,16 @@ public class showList extends AppCompatActivity {
                 i++;
             }
         }
-        //if (i!=1)
-           // tableLayout.addView(row);
+        if (specialid==null)
+        {
+            interact.save(data,"#%just created",new CheckBox(this),new CheckBox(this),null,"main","0");
+        }
+    }
+
+    protected  void onStop()
+    {
+        super.onStop();
+        interact.saveEvent(data,notes.getText().toString(),0,0,specialid);
     }
     public String updateorder(String order)
     {

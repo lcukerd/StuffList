@@ -105,6 +105,21 @@ public class DBinteract {
             Log.d("update operation","complete");
         }
     }
+
+    public void saveEvent(String eventName , String itemName , long start , long end , String id)
+    {
+        SQLiteDatabase db = dBcontract.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(eventDBcontract.ListofItem.columnEvent,eventName);
+        values.put(eventDBcontract.ListofItem.columnName,"#%"+itemName);
+        values.put(eventDBcontract.ListofItem.columntaken,start);
+        values.put(eventDBcontract.ListofItem.columnreturn,end);
+
+        db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
+
+        Log.d("save operation","Event detail complete");
+    }
     private long getmillis()
     {
         Calendar c = Calendar.getInstance();

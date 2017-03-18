@@ -1,5 +1,7 @@
 package lcukerd.com.stufflist;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +14,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,6 +25,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +39,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import static android.graphics.Color.rgb;
+import static android.transition.Fade.IN;
 
 
 public class StartActivity extends AppCompatActivity {
@@ -42,9 +51,11 @@ public class StartActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
     }
 
@@ -58,6 +69,8 @@ public class StartActivity extends AppCompatActivity {
         order = updateorder(order);
 
         setContentView(R.layout.activity_start);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         nestedScrollView = (NestedScrollView) findViewById(R.id.startScroll);
@@ -159,6 +172,7 @@ public class StartActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(),showList.class);
                     intent.putExtra("Event_Name",NameofEvents[ch]);
+                    //startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
                     startActivity(intent);
                 }
             });
@@ -168,14 +182,43 @@ public class StartActivity extends AppCompatActivity {
                     try {
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.actionbuttons,(ViewGroup)findViewById(R.id.actionButtons));
-                        PopupWindow pw = new PopupWindow(layout, 600, 600, true);
+                        PopupWindow pw = new PopupWindow(layout, 350, 200, true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
-                        pw.showAtLocation(v, Gravity.NO_GRAVITY, 200 ,coord[1]+100);
+                        Fade explode = new Fade();
+                        try
+                        {
+                            pw.setEnterTransition(explode);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.e("action button","Error showing transition");
+                        }
+                        pw.showAtLocation(v, Gravity.NO_GRAVITY, 500 ,coord[1]-100);
 
-                       /* Button add = (Button) layout.findViewById(R.id.popupadd);
+                        Button add = (Button) layout.findViewById(R.id.popupadd);
                         Button del = (Button) layout.findViewById(R.id.popupdel);
-                        Button ex = (Button) layout.findViewById(R.id.popupex);
+                        add.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent addItem = new Intent(getApplicationContext(),addItem.class);
+                                addItem.putExtra("eventName",NameofEvents[ch]);
+                                addItem.putExtra("calledby","main");
+                                startActivity(addItem);
+                                recreate();
+                            }
+                        });
+                        del.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                SQLiteDatabase db = dBcontract.getWritableDatabase();
+                                Log.d("delete operation",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+NameofEvents[ch]+"'",null)));
+                                recreate();                                                         //add option to delete files as well
+
+                            }
+                        });
+                        /*
                         add.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
                         del.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
                         ex.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));*/

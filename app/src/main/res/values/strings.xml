@@ -10,5 +10,6 @@
     <string name="order_name_desc">Event name reverse Alphabetically</string>
     <string name="defaultvae">date_desc_event</string>
     <string name="defaultvai">date_desc_item</string>
+    <string name="add_note">Add note</string>
 
 </resources>
