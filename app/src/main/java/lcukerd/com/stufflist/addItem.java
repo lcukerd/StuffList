@@ -10,6 +10,7 @@ image not saved if rotated while closing camera
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +19,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,9 +48,10 @@ public class addItem extends AppCompatActivity {
 
     private Bitmap photo=null;
     private static final int CAMERA_REQUEST = 1004;
+    private static final int SELECT_FILE = 1005;
     private Context context = this;
     private Uri photoURI;
-    private Boolean updateImage = false;
+    private Boolean updateImage = false , galleryused = false;
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private String eventName;
     private Boolean camerastarted = false;
@@ -126,25 +129,7 @@ public class addItem extends AppCompatActivity {
                     r=1;
                 else
                     r=0;
-                Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (startCamera.resolveActivity(getPackageManager())!=null)
-                {
-                   photoFile= null;
-                    try{
-                        photoFile = createImageFile();
-                    }
-                    catch (IOException ex)
-                    {
-                        Log.e("File Creation","error");
-                    }
-                    if (photoFile!=null)
-                    {
-                        photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
-                        startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
-                        camerastarted=true;
-                        startActivityForResult(startCamera,CAMERA_REQUEST);
-                    }
-                }
+                showdialogselector();
 
             }
         });
@@ -190,6 +175,21 @@ public class addItem extends AppCompatActivity {
                 photoURI = null;
             }
         }
+        else if (requestCode==SELECT_FILE)
+        {
+            if (resultCode== Activity.RESULT_OK)
+            {
+
+                photoURI = data.getData();
+                Log.d("Gallery call","opened with result " + photoURI.toString());
+                updateImage=true;
+                galleryused = true;
+            }
+            else {
+                Log.e("Gallery call", "Failed");
+                photoURI = null;
+            }
+        }
     }
     @Override
     public void onWindowFocusChanged(boolean hasFocus)
@@ -200,28 +200,30 @@ public class addItem extends AppCompatActivity {
             try
             {
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                photoFile.delete();
-                File image = createImageFile();
-                photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",image);
                 if (photo.getWidth()<photo.getHeight())
                     photo = Bitmap.createScaledBitmap(photo,720,1280,false);
                 else
                     photo = Bitmap.createScaledBitmap(photo,1280,720,false);
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(image);
-                    photo.compress(Bitmap.CompressFormat.PNG, 100, out);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                if (galleryused = false) {
+                    photoFile.delete();
                 }
+                    FileOutputStream out = null;
+                    try {
+                        File image = createImageFile();
+                        photoURI = FileProvider.getUriForFile(context, "lcukerd.com.android.fileprovider", image);
+                        out = new FileOutputStream(image);
+                        photo.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (out != null) {
+                                out.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 Simage.setImageBitmap(photo);      // Image gets cropped look into it
                 Sname.setText(ItemName);
                 if (t==1)
@@ -238,6 +240,7 @@ public class addItem extends AppCompatActivity {
                 e.printStackTrace();
             }
             updateImage = false;
+            galleryused = false;
         }
 
 
@@ -263,6 +266,46 @@ public class addItem extends AppCompatActivity {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(EName,".jpg",storageDir);
         return image;
+    }
+    private void showdialogselector()
+    {
+        final CharSequence[] items = {"Take Photo", "Choose from Library"};
+        AlertDialog.Builder choose_cap_opt = new AlertDialog.Builder(this);
+        choose_cap_opt.setTitle("Choose where to add from");
+        choose_cap_opt.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (items[item].equals("Take Photo")) {
+                    Intent startCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (startCamera.resolveActivity(getPackageManager())!=null)
+                    {
+                        photoFile= null;
+                        try{
+                            photoFile = createImageFile();
+                        }
+                        catch (IOException ex)
+                        {
+                            Log.e("File Creation","error");
+                        }
+                        if (photoFile!=null)
+                        {
+                            photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
+                            startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
+                            camerastarted=true;
+                            startActivityForResult(startCamera,CAMERA_REQUEST);
+                        }
+                    }
+                } else if (items[item].equals("Choose from Library")) {
+                    Intent intent = new Intent(
+                            Intent.ACTION_PICK,
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, SELECT_FILE);
+                }
+
+            }
+        });
+        choose_cap_opt.show();
     }
 
 }

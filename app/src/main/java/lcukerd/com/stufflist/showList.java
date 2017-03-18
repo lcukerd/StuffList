@@ -120,10 +120,6 @@ public class showList extends AppCompatActivity {
         FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,h/3);
         frameLayout.setLayoutParams(param);
         notes = (EditText) v.findViewById(R.id.addnote);
-        /*notes.setScroller(new Scroller(this));
-        notes.setMaxLines(4);
-        notes.setVerticalScrollBarEnabled(true);
-        notes.setMovementMethod(new ScrollingMovementMethod());*/
         notes.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
@@ -247,12 +243,13 @@ public class showList extends AppCompatActivity {
                     Eimage.setBackground(ob);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.d("Couldn't Load",name+" "+photoURI);
+                    Log.e("Couldn't Load",name+" "+photoURI);
+                    th = th/3;
                 }
             }
             else
             {
-
+                    th = th/2;
             }
 
             frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));

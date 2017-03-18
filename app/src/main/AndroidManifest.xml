@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="lcukerd.com.stufflist">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon"
@@ -20,13 +27,7 @@
         </activity>
         <activity android:name=".addItem" />
 
-        <uses-feature
-            android:name="android.hardware.camera"
-            android:required="false" />
 
-        <uses-permission
-            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-            android:maxSdkVersion="18" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
