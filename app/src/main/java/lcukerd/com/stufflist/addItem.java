@@ -4,16 +4,14 @@ pic disappears after switching app.
 add on screen button to go back
 Remove image from gallery
 image not saved if rotated while closing camera
+clicking on delete, deletes image before pressing on update.
 */
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -53,12 +51,11 @@ public class addItem extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1004;
     private static final int SELECT_FILE = 1005;
     private Context context = this;
-    private Uri photoURI;
-    private Boolean updateImage = false , galleryused = false , deleteimageupdate = false ;
+    private Uri photoURI,photoURIc;
+    private Boolean updateImage = false , galleryused = false , deleteimageupdate = false , calledbylist =false;
     private String eventName;
     private Boolean camerastarted = false , showpopup = false;
     private String ItemName;
-    private eventDBcontract dBcontract = new eventDBcontract(this);
     private int t,r;
     private File photoFile;
     private String caller;
@@ -104,6 +101,7 @@ public class addItem extends AppCompatActivity {
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(info[3]));
                     Simage.setImageBitmap(photo);
                     showpopup = true;
+                    calledbylist = true;
                 }
                 catch (IOException e)
                 {
@@ -134,6 +132,7 @@ public class addItem extends AppCompatActivity {
                     r=1;
                 else
                     r=0;
+
                 showdialogselector();
 
             }
@@ -154,14 +153,12 @@ public class addItem extends AppCompatActivity {
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                SQLiteDatabase db = dBcontract.getWritableDatabase();
-                                if (showpopup==true)
-                                {
+                                if (showpopup == true) {
                                     deleteimage(info[3]);
-                                    showpopup = false;
-                                }
-                                else
+                                    showpopup = false ;
+                                } else
                                     deleteimage(photoURI.toString());
+
                                 recreate();
                             }
                         });
@@ -206,11 +203,14 @@ public class addItem extends AppCompatActivity {
             if (resultCode== Activity.RESULT_OK)
             {
                 Log.d("Camera call","opened with result");
+                if (photoURI!=null)
+                    deleteimage(photoURI.toString());
+                photoURI = photoURIc;
                 updateImage = true;
             }
             else {
                 Log.e("Camera call", "Failed");
-                photoURI = null;
+                updateImage = true;
             }
         }
         else if (requestCode==SELECT_FILE)
@@ -218,6 +218,8 @@ public class addItem extends AppCompatActivity {
             if (resultCode== Activity.RESULT_OK)
             {
 
+                if (photoURI!=null)
+                    deleteimage(photoURI.toString());
                 photoURI = data.getData();
                 Log.d("Gallery call","opened with result " + photoURI.toString());
                 updateImage=true;
@@ -225,7 +227,7 @@ public class addItem extends AppCompatActivity {
             }
             else {
                 Log.e("Gallery call", "Failed");
-                photoURI = null;
+                updateImage = true;
             }
         }
     }
@@ -251,6 +253,7 @@ public class addItem extends AppCompatActivity {
                         File image = createImageFile();
                         photoURI = FileProvider.getUriForFile(context, "lcukerd.com.android.fileprovider", image);
                         out = new FileOutputStream(image);
+                        deleteimageupdate = false;
                         photo.compress(Bitmap.CompressFormat.PNG, 100, out);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -322,8 +325,8 @@ public class addItem extends AppCompatActivity {
                         }
                         if (photoFile!=null)
                         {
-                            photoURI = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
-                            startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
+                            photoURIc = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
+                            startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURIc);
                             camerastarted=true;
                             startActivityForResult(startCamera,CAMERA_REQUEST);
                         }
