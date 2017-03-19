@@ -94,6 +94,8 @@ public class DBinteract {
             values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
             Log.d("File address write", photoURI.toString());
         }
+        else
+            values.putNull(eventDBcontract.ListofItem.columnFileloc);
         if (caller.equals("main"))
         {
             db.insert(eventDBcontract.ListofItem.tableName,null,values);

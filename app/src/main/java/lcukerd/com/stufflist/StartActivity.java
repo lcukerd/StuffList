@@ -225,7 +225,7 @@ public class StartActivity extends AppCompatActivity {
 
                         /*Log.d("Long Click","successful");
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View layout = inflater.inflate(R.layout.popup,(ViewGroup)findViewById(R.id.pop));
+                        View layout = inflater.inflate(R.layout.popup,(ViewGroup)findViewById(R.id.popl));
                         PopupWindow pw = new PopupWindow(layout, 400, 200, true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);

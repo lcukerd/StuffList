@@ -12,4 +12,8 @@
     <string name="defaultvai">date_desc_item</string>
     <string name="add_note">Add note</string>
 
+    <string name="title_activity_show_pic">showPic</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>

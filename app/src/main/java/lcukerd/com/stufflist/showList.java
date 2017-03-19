@@ -1,26 +1,18 @@
 package lcukerd.com.stufflist;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.text.method.ScrollingMovementMethod;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,8 +22,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;;
 import android.widget.EditText;
@@ -40,11 +30,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.Scroller;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-import java.io.IOException;
 
 public class showList extends AppCompatActivity {
 
@@ -172,24 +158,39 @@ public class showList extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            final String thisimageuri = photoURI;
             cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     try {
                         Log.d("Long Click","successful");
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View layout = inflater.inflate(R.layout.popup,(ViewGroup)findViewById(R.id.pop));
-                        PopupWindow pw = new PopupWindow(layout, 400, 200, true);
+                        View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
+                        final PopupWindow pw = new PopupWindow(layout, 400, 400, true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
                         pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
                         Button del = (Button) layout.findViewById(R.id.del);
+                        Button viewImage = (Button) layout.findViewById(R.id.view);
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 SQLiteDatabase db = dBcontract.getWritableDatabase();
+                                deleteimage(photoURI);
                                 Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+id,null)));
                                 recreate();                                                         //add option to delete files as well
+                            }
+                        });
+                        viewImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (thisimageuri!=null)
+                                {
+                                    Intent intent = new Intent(getApplicationContext(),showPic.class);
+                                    intent.putExtra("photo uri",thisimageuri);
+                                    pw.dismiss();
+                                    startActivity(intent);
+                                }
                             }
                         });
 
@@ -239,7 +240,7 @@ public class showList extends AppCompatActivity {
                         th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
                         Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
                     }
-                    BitmapDrawable ob = new BitmapDrawable(getResources(), photo);
+                    BitmapDrawable ob = new BitmapDrawable(getResources(), photo);                  //else pic was displayed over text
                     Eimage.setBackground(ob);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -328,7 +329,11 @@ public class showList extends AppCompatActivity {
             order = eventDBcontract.ListofItem.columnName+" DESC";
         return order;
     }
-
+    private void deleteimage(String imageloc)
+    {
+        ContentResolver imagefile = getContentResolver();
+        Log.d("file deletion",String.valueOf(imagefile.delete(Uri.parse(imageloc),null,null))+" "+imageloc);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_start, menu);

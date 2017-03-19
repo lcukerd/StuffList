@@ -2,12 +2,12 @@ package lcukerd.com.stufflist;
 /*
 pic disappears after switching app.
 add on screen button to go back
-text data in edittext disappears if clicked on add image after writing event name
 Remove image from gallery
 image not saved if rotated while closing camera
 */
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,12 +23,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
 import java.io.File;
@@ -51,16 +54,17 @@ public class addItem extends AppCompatActivity {
     private static final int SELECT_FILE = 1005;
     private Context context = this;
     private Uri photoURI;
-    private Boolean updateImage = false , galleryused = false;
-    private eventDBcontract dBcontract = new eventDBcontract(this);
+    private Boolean updateImage = false , galleryused = false , deleteimageupdate = false ;
     private String eventName;
-    private Boolean camerastarted = false;
+    private Boolean camerastarted = false , showpopup = false;
     private String ItemName;
+    private eventDBcontract dBcontract = new eventDBcontract(this);
     private int t,r;
     private File photoFile;
     private String caller;
     private Intent add;
     private String id;
+    private String info[] = new String[5];
     private DBinteract interact = new DBinteract(this);
 
     @Override
@@ -84,7 +88,7 @@ public class addItem extends AppCompatActivity {
 
         if (caller.equals("list"))
         {
-            String info[] = add.getStringArrayExtra("available data");
+            info = add.getStringArrayExtra("available data");
             Sname.setText(info[0]);
             if (info[1].equals("1"))
                 taken.setChecked(true);
@@ -99,6 +103,7 @@ public class addItem extends AppCompatActivity {
                 try {
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(info[3]));
                     Simage.setImageBitmap(photo);
+                    showpopup = true;
                 }
                 catch (IOException e)
                 {
@@ -133,6 +138,40 @@ public class addItem extends AppCompatActivity {
 
             }
         });
+        Simage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if ((photoURI!=null)||(showpopup==true)) {
+                    try {
+                        Log.d("Long Click", "successful");
+                        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View layout = inflater.inflate(R.layout.popup, (ViewGroup) findViewById(R.id.pop));
+                        PopupWindow pw = new PopupWindow(layout, 400, 200, true);
+                        int coord[] = new int[2];
+                        v.getLocationOnScreen(coord);
+                        pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50, coord[1] + 100);
+                        Button del = (Button) layout.findViewById(R.id.del);
+                        del.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                SQLiteDatabase db = dBcontract.getWritableDatabase();
+                                if (showpopup==true)
+                                {
+                                    deleteimage(info[3]);
+                                    showpopup = false;
+                                }
+                                else
+                                    deleteimage(photoURI.toString());
+                                recreate();
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }return true;
+            }
+        });
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,7 +198,6 @@ public class addItem extends AppCompatActivity {
             onWindowFocusChanged(true);
 
     }
-
 
     protected void onActivityResult(int requestCode,int resultCode,Intent data)
     {
@@ -191,6 +229,7 @@ public class addItem extends AppCompatActivity {
             }
         }
     }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus)
     {
@@ -245,19 +284,11 @@ public class addItem extends AppCompatActivity {
 
 
     }
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+
+    private void deleteimage(String imageloc)
+    {
+        ContentResolver imagefile = getContentResolver();
+        Log.d("file deletion",String.valueOf(imagefile.delete(Uri.parse(imageloc),null,null))+" "+imageloc);
     }
 
     private File createImageFile() throws IOException
@@ -267,6 +298,7 @@ public class addItem extends AppCompatActivity {
         File image = File.createTempFile(EName,".jpg",storageDir);
         return image;
     }
+
     private void showdialogselector()
     {
         final CharSequence[] items = {"Take Photo", "Choose from Library"};

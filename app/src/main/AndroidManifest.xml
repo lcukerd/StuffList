@@ -9,6 +9,7 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon"
@@ -25,9 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".addItem" />
-
-
+        <activity
+            android:name=".addItem"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -39,11 +41,16 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".showList"
-            android:windowSoftInputMode="stateHidden"></activity>
-        <activity android:name=".orderevent"></activity>
-        <activity android:name=".orderitem"></activity>
-
+        <activity
+            android:name=".showList"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".orderevent" />
+        <activity android:name=".orderitem" />
+        <activity
+            android:name=".showPic"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_show_pic"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>
