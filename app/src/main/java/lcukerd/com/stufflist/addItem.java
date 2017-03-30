@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -29,8 +30,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,6 +66,7 @@ public class addItem extends AppCompatActivity {
     private String id;
     private String info[] = new String[5];
     private DBinteract interact = new DBinteract(this);
+    private eventDBcontract dBcontract = new eventDBcontract(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +74,24 @@ public class addItem extends AppCompatActivity {
         add = getIntent();
         eventName = add.getStringExtra("eventName");
         caller = add.getStringExtra("calledby");
+        String nameOfevents[] = interact.readfromDB(eventDBcontract.ListofItem.columndatetime+" ASC");
+        try
+        {if (nameOfevents[0].equals("Titorizl")) {
+            SQLiteDatabase db = dBcontract.getWritableDatabase();
+            Log.d("delete operation",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+nameOfevents[0]+"'",null)));
+            Intent tutorial = new Intent(this, showPic.class);
+            tutorial.putExtra("photo uri", "tutorial");
+            startActivity(tutorial);
+        }}
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     protected void onStart()
     {
         super.onStart();
+
         setContentView(R.layout.activity_add_item);
 
         Sname = (EditText) findViewById(R.id.Sname);
@@ -154,10 +172,18 @@ public class addItem extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 if (showpopup == true) {
-                                    deleteimage(info[3]);
+                                    if (info[3].charAt(0)!='a')
+                                        deleteimage(info[3]);
+                                    else
+                                        info[3] = null;
                                     showpopup = false ;
                                 } else
-                                    deleteimage(photoURI.toString());
+                                {
+                                    if (photoURI.toString().charAt(0)!='a')
+                                        deleteimage(photoURI.toString());
+                                    else
+                                        photoURI = null;
+                                }
 
                                 recreate();
                             }

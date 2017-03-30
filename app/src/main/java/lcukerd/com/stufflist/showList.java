@@ -1,6 +1,7 @@
 package lcukerd.com.stufflist;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,8 @@ public class showList extends AppCompatActivity {
 
     private GridLayout gridLayout;
     private LinearLayout l1 , l2 , l3;
+    private int j=0;
+    private int columns,w,h,c1=0,c2=0,c3=0,i=0;
     private View v;
     private CardView cardView;
     private Cursor cursor;
@@ -44,6 +48,9 @@ public class showList extends AppCompatActivity {
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private EditText notes ;
     private String specialid = null;
+    private FrameLayout frameLayout;
+    private DisplayMetrics metrics;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,20 +63,20 @@ public class showList extends AppCompatActivity {
     {
         super.onResume();
 
+        j=0;
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(this);
         String order = preferences.getString("pref_item_order",getString(R.string.defaultvai));
         order = updateorder(order);
 
         setContentView(R.layout.activity_show_list);
         getSupportActionBar().setTitle(data);
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33ff4444")));
         gridLayout = (GridLayout) findViewById(R.id.grid);
 
-        int i=1;
-
-        DisplayMetrics metrics = new DisplayMetrics();
+        metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int columns,w,h;
+
+        columns=0;
+        w=h=c1=c2=c3=i=0;
 
         if (metrics.heightPixels>=metrics.widthPixels)
         {
@@ -100,9 +107,10 @@ public class showList extends AppCompatActivity {
             gridLayout.addView(l2);
             gridLayout.addView(l3);
         }
+        cursor = interact.readinEvent(data,order);
 
         v =  View.inflate(this,R.layout.customnote,null);
-        FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+        frameLayout = (FrameLayout) v.findViewById(R.id.frame);
         FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,h/3);
         frameLayout.setLayoutParams(param);
         notes = (EditText) v.findViewById(R.id.addnote);
@@ -122,194 +130,28 @@ public class showList extends AppCompatActivity {
         });
         l3.addView(frameLayout);
 
-        int th,tw,c1=0,c2=0,c3=h/3;
-        cursor = interact.readinEvent(data,order);
+        c3=h/3;
+        int tw=0,th=0;
+
+        Log.d("no. of rows",String.valueOf(cursor.getCount()-1));
+        loadList bklistgene;
 
         while(cursor.moveToNext())                                                                  // To display list
         {
-            tw = w;
-            th = h;
-            v =  View.inflate(this,R.layout.trying,null);
-            frameLayout = (FrameLayout) v.findViewById(R.id.frame);
-
-            cardView = (CardView) v.findViewById(R.id.cardSample);
-            final String ct = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken));
-            final String rt = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn));
-            final String photoURI = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc));
-            final String name = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
-            final String id = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
-
-            if (name.length()>=2)
-                if ((name.charAt(0)=='#')&&(name.charAt(1)=='%'))
-                  {
-                      specialid =id;
-                      notes.setText(name.substring(2));
-                      Log.d("found special id",String.valueOf(id));
-                      continue;
-                  }
-            Log.d("id",String.valueOf(id));
-            cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(),addItem.class);
-                    intent.putExtra("eventName",data);
-                    intent.putExtra("calledby","list");
-                    intent.putExtra("available data",new String[]{ name , ct , rt , photoURI , id });
-                    startActivity(intent);
-                }
-            });
-            final String thisimageuri = photoURI;
-            cardView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    try {
-                        Log.d("Long Click","successful");
-                        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
-                        final PopupWindow pw = new PopupWindow(layout, 400, 400, true);
-                        int coord[]= new int[2];
-                        v.getLocationOnScreen(coord);
-                        pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
-                        Button del = (Button) layout.findViewById(R.id.del);
-                        Button viewImage = (Button) layout.findViewById(R.id.view);
-                        del.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                SQLiteDatabase db = dBcontract.getWritableDatabase();
-                                deleteimage(photoURI);
-                                Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+id,null)));
-                                recreate();                                                         //add option to delete files as well
-                            }
-                        });
-                        viewImage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (thisimageuri!=null)
-                                {
-                                    Intent intent = new Intent(getApplicationContext(),showPic.class);
-                                    intent.putExtra("photo uri",thisimageuri);
-                                    pw.dismiss();
-                                    startActivity(intent);
-                                }
-                            }
-                        });
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                }
-            });
-
-            final TextView Ename = (TextView) v.findViewById(R.id.textView);
-            final CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
-            final ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
-
-            taken.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (ct.equals(String.valueOf(taken.isChecked()))==false)
-                    {
-                        if (photoURI!=null)
-                            interact.save(data,Ename.getText().toString(),taken,returned,Uri.parse(photoURI),"update",id);
-                        else
-                            interact.save(data,Ename.getText().toString(),taken,returned,null,"update",id);
-                    }
-                }
-            });
-            returned.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (rt.equals(String.valueOf(returned.isChecked()))==false)
-                    {
-                        if (photoURI!=null)
-                            interact.save(data,Ename.getText().toString(),taken,returned,Uri.parse(photoURI),"update",id);
-                        else
-                            interact.save(data,Ename.getText().toString(),taken,returned,null,"update",id);
-                    }
-                }
-            });
-
-            if(photoURI!=null) {
-                try {
-
-                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(photoURI));
-                    Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
-                    if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
-                    {
-                        th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
-                        Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
-                    }
-                    BitmapDrawable ob = new BitmapDrawable(getResources(), photo);                  //else pic was displayed over text
-                    Eimage.setBackground(ob);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("Couldn't Load",name+" "+photoURI);
-                    th = th/3;
-                }
-            }
+            bklistgene =  new loadList();
+            final String infoDB[]= new String[6];
+            infoDB[0] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken));
+            infoDB[1] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn));
+            infoDB[2] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc));
+            infoDB[3] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
+            infoDB[4] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
+            infoDB[5] = data;
+            if(cursor.isLast())
+                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],"last");
             else
-            {
-                    th = th/2;
-            }
-
-            frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));
-
-            if (name.equals("")==false)
-                Ename.setText(name);                                                                    //adds data in card
-
-            if (ct.equals(String.valueOf(1)))
-                taken.setChecked(true);
-            else
-                taken.setChecked(false);
-            if (rt.equals(String.valueOf(1)))
-                returned.setChecked(true);
-            else
-                returned.setChecked(false);
-
-            if (columns==3) {
-                if ((c1 < c2) && (c1 < c3))
-                    i = 1;
-                else if ((c2 < c1) && (c2 < c3))
-                    i = 2;
-                else if ((c3<c1)&&(c3<c2))
-                    i = 3;
-                else if (c2 == c3)
-                    i = 2;
-                else
-                    i = 1;
-            }
-            else if (columns==2)
-            {
-                if (c1<=c3)
-                    i = 1;
-                else
-                    i = 2;
-            }
-
-            if (i==columns)                                                                         // adding rows
-            {
-                c3+=th;
-                l3.addView(v);
-                i=1;
-            }
-            else if (i==1)
-            {
-                c1+=th;
-                l1.addView(v);
-                i++;
-            }
-            else if (i<columns)
-            {
-                c2+=th;
-                l2.addView(v);
-                i++;
-            }
+                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],"not last");
         }
-        if (specialid==null)
-        {
-            interact.save(data,"#%just created",new CheckBox(this),new CheckBox(this),null,"main","0");
-        }
+
     }
 
     protected  void onStop()
@@ -357,6 +199,211 @@ public class showList extends AppCompatActivity {
         }
         else
             return super.onOptionsItemSelected(item);
+    }
+
+    class loadList extends AsyncTask<String,Void,String[]>
+    {
+        private BitmapDrawable ob;
+        private int tw,th;
+        protected String[] doInBackground(String data[])
+        {
+            tw = w;
+            th = h;
+
+            if (data[3].length()>=2)
+                if ((data[3].charAt(0)=='#')&&(data[3].charAt(1)=='%'))
+                {
+                    specialid = data[4];
+                    Log.d("found special id",String.valueOf(data[4]));
+                    this.cancel(true);
+                    return data;                                                                    //return statement
+                }
+            Log.d("id",String.valueOf(data[4]));
+
+            if(data[2]!=null) {
+                try {
+
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(data[2]));
+                    Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
+                    if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
+                    {
+                        th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
+                        Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
+                    }
+                    ob = new BitmapDrawable(getResources(), photo);                  //else pic was displayed over text
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("Couldn't Load",data[3]+" "+data[2]);
+                    th = th/3;
+                }
+            }
+            else
+            {
+                th = th/2;
+            }
+            return data;
+
+        }
+        protected void onPostExecute(final String data[])
+        {
+            v =  View.inflate(context,R.layout.trying,null);
+            frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+
+            cardView = (CardView) v.findViewById(R.id.cardSample);
+
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(),addItem.class);
+                    intent.putExtra("eventName",data[5]);
+                    intent.putExtra("calledby","list");
+                    intent.putExtra("available data",new String[]{ data[3] , data[0] , data[1] , data[2] , data[4] });
+                    startActivity(intent);
+                }
+            });
+            final String thisimageuri = data[2];
+            cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    try {
+                        Log.d("Long Click","successful");
+                        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
+                        final PopupWindow pw = new PopupWindow(layout, 400, 400, true);
+                        int coord[]= new int[2];
+                        v.getLocationOnScreen(coord);
+                        pw.setOutsideTouchable(true);
+                        pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
+                        Button del = (Button) layout.findViewById(R.id.del);
+                        Button viewImage = (Button) layout.findViewById(R.id.view);
+                        del.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                SQLiteDatabase db = dBcontract.getWritableDatabase();
+                                if ((thisimageuri!=null)&&(thisimageuri.toString().charAt(0)!='a'))
+                                    deleteimage(thisimageuri);
+                                Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+data[4],null)));
+                                recreate();                                                         //add option to delete files as well
+                            }
+                        });
+                        viewImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (thisimageuri!=null)
+                                {
+                                    Intent intent = new Intent(getApplicationContext(),showPic.class);
+                                    intent.putExtra("photo uri",thisimageuri);
+                                    pw.dismiss();
+                                    startActivity(intent);
+                                }
+                            }
+                        });
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                }
+            });
+
+            final TextView Ename = (TextView) v.findViewById(R.id.textView);
+            final CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
+            final ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
+
+            taken.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (data[0].equals(String.valueOf(taken.isChecked()))==false)
+                    {
+                        if (data[2]!=null)
+                            interact.save(data[5],Ename.getText().toString(),taken,returned,Uri.parse(data[2]),"update",data[4]);
+                        else
+                            interact.save(data[5],Ename.getText().toString(),taken,returned,null,"update",data[4]);
+                    }
+                }
+            });
+            returned.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (data[1].equals(String.valueOf(returned.isChecked()))==false)
+                    {
+                        if (data[2]!=null)
+                            interact.save(data[5],Ename.getText().toString(),taken,returned,Uri.parse(data[2]),"update",data[4]);
+                        else
+                            interact.save(data[5],Ename.getText().toString(),taken,returned,null,"update",data[4]);
+                    }
+                }
+            });
+            if (data[2]!=null)
+                Eimage.setBackground(ob);
+
+            frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));
+
+            if (data[3].equals("")==false)
+                Ename.setText(data[3]);                                                                    //adds data in card
+
+            if (data[0].equals(String.valueOf(1)))
+                taken.setChecked(true);
+            else
+                taken.setChecked(false);
+            if (data[1].equals(String.valueOf(1)))
+                returned.setChecked(true);
+            else
+                returned.setChecked(false);
+
+            if (columns==3) {
+                if ((c1 < c2) && (c1 < c3))
+                    i = 1;
+                else if ((c2 < c1) && (c2 < c3))
+                    i = 2;
+                else if ((c3<c1)&&(c3<c2))
+                    i = 3;
+                else if (c2 == c3)
+                    i = 2;
+                else
+                    i = 1;
+            }
+            else if (columns==2)
+            {
+                if (c1<=c3)
+                    i = 1;
+                else
+                    i = 2;
+            }
+
+            if (i==columns)                                                                         // adding rows
+            {
+                c3+=th;
+                l3.addView(v);
+                i=1;
+            }
+            else if (i==1)
+            {
+                c1+=th;
+                l1.addView(v);
+                i++;
+            }
+            else if (i<columns)
+            {
+                c2+=th;
+                l2.addView(v);
+                i++;
+            }
+            if (data[6].equals("last"))
+            {
+                if (specialid==null)
+                {
+                    interact.save(data[5],"#%",new CheckBox(context),new CheckBox
+                    (           context),null,"main","0");
+                }
+            }
+        }
+        protected void onCancelled(String data[])
+        {
+            notes.setText(data[3].substring(2));
+        }
     }
 
 }

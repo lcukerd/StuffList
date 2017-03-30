@@ -50,7 +50,11 @@
             android:name=".showPic"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_show_pic"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".IntroActivity"
+            android:label="@string/title_activity_intro"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

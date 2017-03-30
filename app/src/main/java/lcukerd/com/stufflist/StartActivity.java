@@ -1,23 +1,20 @@
 package lcukerd.com.stufflist;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
 import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,21 +22,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 
-import java.text.ParseException;
-import java.util.Date;
-
-import static android.graphics.Color.rgb;
-import static android.transition.Fade.IN;
 
 
 public class StartActivity extends AppCompatActivity {
@@ -55,7 +43,10 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        String nameOfevents[] = interact.readfromDB(eventDBcontract.ListofItem.columndatetime+" ASC");
+        if (nameOfevents.length>0)
+            if (nameOfevents[0].equals("Titorizl"))
+                startActivity(new Intent(this,IntroActivity.class));
 
     }
 
@@ -79,7 +70,6 @@ public class StartActivity extends AppCompatActivity {
 
         String nameOfevents[] = interact.readfromDB(order);
         UpdateScrollView(nameOfevents);
-
         nestedScrollView.addView(linearLayout);
     }
 
@@ -117,13 +107,19 @@ public class StartActivity extends AppCompatActivity {
             startActivity(new Intent(this,orderevent.class));
             return true;
         }
+        else if (id == R.id.action_tut)
+        {
+            //start tutorial
+        }
             return super.onOptionsItemSelected(item);
     }
 
     public void setName()                                                                           // Open dialog box
     {
         AlertDialog.Builder eventName = new AlertDialog.Builder(this,R.style.dialogStyle);
-        eventName.setView(R.layout.dialog_add_name);
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService (Context.LAYOUT_INFLATER_SERVICE);
+        View dialogb = inflater.inflate(R.layout.dialog_add_name, null);
+        eventName.setView(dialogb);
         final AlertDialog dialog = eventName.create();
         dialog.show();
         final InputMethodManager imm = (InputMethodManager)   getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -159,65 +155,71 @@ public class StartActivity extends AppCompatActivity {
     private void UpdateScrollView(final String NameofEvents[])                                      // reads array of string to display list of events
     {
         Button events;
-        for (int i=0;i<NameofEvents.length;i++)
-        {
-            events = new Button(this);
+        for (int i=0;i<NameofEvents.length;i++) {
+            if (NameofEvents[i].equals("Titorizl") == false) {
+                events = new Button(this);
 
-            events.setGravity(View.TEXT_DIRECTION_LTR);
-            events.setText(NameofEvents[i]);
-            linearLayout.addView(events);
-            final int ch=i;
-            events.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(),showList.class);
-                    intent.putExtra("Event_Name",NameofEvents[ch]);
-                    //startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
-                    startActivity(intent);
-                }
-            });
-            events.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    try {
-                        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-                        View layout = inflater.inflate(R.layout.actionbuttons,(ViewGroup)findViewById(R.id.actionButtons));
-                        PopupWindow pw = new PopupWindow(layout, 350, 200, true);
-                        int coord[]= new int[2];
-                        v.getLocationOnScreen(coord);
-                        Fade explode = new Fade();
-                        try
-                        {
-                            pw.setEnterTransition(explode);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.e("action button","Error showing transition");
-                        }
-                        pw.showAtLocation(v, Gravity.NO_GRAVITY, 500 ,coord[1]-100);
+                events.setGravity(View.TEXT_DIRECTION_LTR);
+                events.setText(NameofEvents[i]);
+                linearLayout.addView(events);
+                final int ch = i;
+                events.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getApplicationContext(), showList.class);
+                        intent.putExtra("Event_Name", NameofEvents[ch]);
+                        //startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
+                        startActivity(intent);
+                    }
+                });
+                events.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        try {
+                            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                            View layout = inflater.inflate(R.layout.actionbuttons, (ViewGroup) findViewById(R.id.actionButtons));
+                            PopupWindow pw = new PopupWindow(layout, 350, 200, true);
+                            int coord[] = new int[2];
+                            v.getLocationOnScreen(coord);
 
-                        Button add = (Button) layout.findViewById(R.id.popupadd);
-                        Button del = (Button) layout.findViewById(R.id.popupdel);
-                        add.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent addItem = new Intent(getApplicationContext(),addItem.class);
-                                addItem.putExtra("eventName",NameofEvents[ch]);
-                                addItem.putExtra("calledby","main");
-                                startActivity(addItem);
-                                recreate();
+                            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                Fade explode = new Fade();
+                                pw.setEnterTransition(explode);
                             }
-                        });
-                        del.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                SQLiteDatabase db = dBcontract.getWritableDatabase();
-                                Log.d("delete operation",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+NameofEvents[ch]+"'",null)));
-                                recreate();                                                         //add option to delete files as well
 
-                            }
-                        });
+                            pw.showAtLocation(v, Gravity.NO_GRAVITY, 500, coord[1] - 100);
+
+                            Button add = (Button) layout.findViewById(R.id.popupadd);
+                            Button del = (Button) layout.findViewById(R.id.popupdel);
+                            add.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent addItem = new Intent(getApplicationContext(), addItem.class);
+                                    addItem.putExtra("eventName", NameofEvents[ch]);
+                                    addItem.putExtra("calledby", "main");
+                                    startActivity(addItem);
+                                    recreate();
+                                }
+                            });
+                            del.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    SQLiteDatabase db = dBcontract.getWritableDatabase();
+                                    Cursor cursor = interact.readinEvent(NameofEvents[ch], eventDBcontract.ListofItem.columndatetime + " ASC");
+                                    while (cursor.moveToNext()) {
+                                        String imageloc = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc));
+                                        if (imageloc != null) {
+                                            if (imageloc.charAt(0)!='a') {
+                                                ContentResolver imagefile = getContentResolver();
+                                                Log.d("file deletion", String.valueOf(imagefile.delete(Uri.parse(imageloc), null, null)) + " " + imageloc);
+                                            }
+                                        }
+                                        Log.d("delete operaiton", String.valueOf(db.delete(eventDBcontract.ListofItem.tableName, eventDBcontract.ListofItem.columnID + " = " + cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID)), null)));
+                                    }//Log.d("delete operation",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+NameofEvents[ch]+"'",null)));
+                                    recreate();                                                         //add option to delete files as well
+
+                                }
+                            });
                         /*
                         add.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
                         del.setLayoutParams(new GridLayout.LayoutParams(new ViewGroup.LayoutParams(75,75)));
@@ -240,13 +242,14 @@ public class StartActivity extends AppCompatActivity {
                             }
                         });*/
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return true;
 
-                }
-            });
+                    }
+                });
+            }
         }
     }
 

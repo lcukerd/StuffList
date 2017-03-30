@@ -2,6 +2,7 @@
     <string name="app_name">Stuff List</string>
     <string name="order_by">order by</string>
     <string name="action_settings">Settings</string>
+    <string name="action_tutorial">Start Tutorial</string>
 
     <string name="order_title">Order By</string>
     <string name="order_date_asc">Last updated on bottom</string>
@@ -15,5 +16,9 @@
     <string name="title_activity_show_pic">showPic</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_intro">IntroActivity</string>
+    <string name="tut_p1">Page 1</string>
+    <string name="tut_p2">Page 2</string>
+    <string name="tut_p3">Page 3</string>
 
 </resources>

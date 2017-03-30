@@ -15,5 +15,11 @@
         android:title="@string/action_settings"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/action_tut"
+        android:orderInCategory="105"
+        android:title="@string/action_tutorial"
+        app:showAsAction="never"
+        />
 
 </menu>
