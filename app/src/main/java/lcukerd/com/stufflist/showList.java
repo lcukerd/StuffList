@@ -8,10 +8,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -178,7 +180,7 @@ public class showList extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_start, menu);
+        getMenuInflater().inflate(R.menu.menu_intro, menu);
         return true;
     }
     @Override
@@ -224,6 +226,10 @@ public class showList extends AppCompatActivity {
                 try {
 
                     Bitmap photo = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(data[2]));
+                    if (photo.getHeight()>photo.getWidth())
+                        photo = Bitmap.createScaledBitmap(photo,metrics.widthPixels/2,metrics.heightPixels/2,false);
+                    else
+                        photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/2,metrics.widthPixels/2,false);
                     Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
                     if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
                     {
@@ -270,9 +276,10 @@ public class showList extends AppCompatActivity {
                         Log.d("Long Click","successful");
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
-                        final PopupWindow pw = new PopupWindow(layout, 400, 400, true);
+                        final PopupWindow pw = new PopupWindow(layout, 400 * (metrics.widthPixels/1080) , 400, true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
+                        pw.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent)));
                         pw.setOutsideTouchable(true);
                         pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
                         Button del = (Button) layout.findViewById(R.id.del);

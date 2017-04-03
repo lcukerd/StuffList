@@ -14,11 +14,9 @@
     <string name="add_note">Add note</string>
 
     <string name="title_activity_show_pic">showPic</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_intro">IntroActivity</string>
-    <string name="tut_p1">Page 1</string>
-    <string name="tut_p2">Page 2</string>
-    <string name="tut_p3">Page 3</string>
-
+    <string name="tut_p1_H">Going on a trip/event?</string>
+    <string name="tut_p1">Make a list of items needed in a clean and sleek UI.</string>
+    <string name="tut_p2_H">Don"'"t forget to bring back your items!</string>
+    <string name="tut_p2">Taking item is only half of job, make sure you bring it back.</string>
 </resources>

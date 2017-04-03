@@ -2,19 +2,23 @@ package lcukerd.com.stufflist;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +40,8 @@ public class StartActivity extends AppCompatActivity {
     private eventDBcontract dBcontract = new eventDBcontract(this);
     private LinearLayout linearLayout;
     private DBinteract interact = new DBinteract(this);
+    private ContentValues values;
+    private DisplayMetrics metrics;
 
 
 
@@ -61,7 +67,8 @@ public class StartActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_start);
 
-
+        metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         nestedScrollView = (NestedScrollView) findViewById(R.id.startScroll);
@@ -86,8 +93,6 @@ public class StartActivity extends AppCompatActivity {
         return order;
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_start, menu);
@@ -109,9 +114,28 @@ public class StartActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_tut)
         {
-            //start tutorial
+            SQLiteDatabase db = dBcontract.getWritableDatabase();
+            values = new ContentValues();
+            values.put(eventDBcontract.ListofItem.columnEvent,"Titorizl");
+            db.insert(eventDBcontract.ListofItem.tableName,null,values);
+            for (int i=0;i<12;i++) {
+                values = new ContentValues();
+                adddummyitem("Item " + String.valueOf(i), i % 2, i % 3, R.drawable.d1 + i);
+                db.insert(eventDBcontract.ListofItem.tableName,null,values);
+            }
+            startActivity(new Intent(this,IntroActivity.class));
         }
             return super.onOptionsItemSelected(item);
+    }
+    public void adddummyitem(String name,int t,int r,int id)
+    {
+        values.put(eventDBcontract.ListofItem.columnEvent,"Sample");
+        values.put(eventDBcontract.ListofItem.columnName,name);
+        values.put(eventDBcontract.ListofItem.columndatetime,0);
+        values.put(eventDBcontract.ListofItem.columntaken,String.valueOf(t));
+        values.put(eventDBcontract.ListofItem.columnreturn,String.valueOf(r));
+        Uri path = Uri.parse("android.resource://lcukerd.com.stufflist/" + id);
+        values.put(eventDBcontract.ListofItem.columnFileloc, path.toString());
     }
 
     public void setName()                                                                           // Open dialog box
@@ -178,7 +202,10 @@ public class StartActivity extends AppCompatActivity {
                         try {
                             LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                             View layout = inflater.inflate(R.layout.actionbuttons, (ViewGroup) findViewById(R.id.actionButtons));
-                            PopupWindow pw = new PopupWindow(layout, 350, 200, true);
+                            Log.d("Popup",String.valueOf(metrics.widthPixels));
+                            PopupWindow pw = new PopupWindow(layout, 350  * (metrics.widthPixels/1080), 200, true);
+                            pw.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent)));
+                            pw.setOutsideTouchable(true);
                             int coord[] = new int[2];
                             v.getLocationOnScreen(coord);
 

@@ -14,13 +14,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -88,7 +91,8 @@ public class addItem extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    protected void onStart()
+
+    protected void onStart()                                                                        //Delete photoUri in ondestroy if not clicked on either button
     {
         super.onStart();
 
@@ -166,6 +170,8 @@ public class addItem extends AppCompatActivity {
                         PopupWindow pw = new PopupWindow(layout, 400, 200, true);
                         int coord[] = new int[2];
                         v.getLocationOnScreen(coord);
+                        pw.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent)));
+                        pw.setOutsideTouchable(true);
                         pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50, coord[1] + 100);
                         Button del = (Button) layout.findViewById(R.id.del);
                         del.setOnClickListener(new View.OnClickListener() {
@@ -206,7 +212,10 @@ public class addItem extends AppCompatActivity {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
+                if ((photoURI==null)&&(caller.equals("list")))
+                    interact.save(eventName,Sname.getText().toString(),taken,returned,Uri.parse(info[3]),caller,id);
+                else
+                    interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
                 camerastarted=false;
                 Sname.setText("");
                 taken.setChecked(false);
@@ -267,10 +276,18 @@ public class addItem extends AppCompatActivity {
             try
             {
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                if (photo.getWidth()<photo.getHeight())
+                /*if (photo.getWidth()<photo.getHeight())
                     photo = Bitmap.createScaledBitmap(photo,720,1280,false);
                 else
                     photo = Bitmap.createScaledBitmap(photo,1280,720,false);
+                */
+                DisplayMetrics metrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                if (photo.getHeight()>photo.getWidth())
+                    photo = Bitmap.createScaledBitmap(photo,metrics.widthPixels/2,metrics.heightPixels/2,false);
+                else
+                    photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/2,metrics.widthPixels/2,false);
+
                 if (galleryused = false) {
                     photoFile.delete();
                 }

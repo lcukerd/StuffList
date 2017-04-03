@@ -48,7 +48,7 @@ public class eventDBcontract extends SQLiteOpenHelper{
          }
 
      }
-     void adddummyitem(String name,int t,int r,int id)
+     public void adddummyitem(String name,int t,int r,int id)
      {
          values.put(eventDBcontract.ListofItem.columnEvent,"Sample");
          values.put(eventDBcontract.ListofItem.columnName,name);

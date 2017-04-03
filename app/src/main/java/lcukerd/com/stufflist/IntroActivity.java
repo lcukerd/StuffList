@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.TextView;
 
 public class IntroActivity extends AppCompatActivity {
@@ -43,8 +44,7 @@ public class IntroActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_intro, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -78,17 +78,16 @@ public class IntroActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            TextView Heading = (TextView) rootView.findViewById(R.id.heading) , Description  = (TextView) rootView.findViewById(R.id.desc);
+            //Button go = (Button) rootView.findViewById(R.id.go);
             if (getArguments().getInt(ARG_SECTION_NUMBER)==1) {
-                textView.setText(getString(R.string.tut_p1));
+                Heading.setText(getString(R.string.tut_p1_H));
+                Description.setText(getString(R.string.tut_p1));
             }
             else if (getArguments().getInt(ARG_SECTION_NUMBER)==2)
             {
-                textView.setText(getString(R.string.tut_p2));
-            }
-            else
-            {
-                textView.setText(getString(R.string.tut_p3));
+                Heading.setText(getString(R.string.tut_p2_H));
+                Description.setText(getString(R.string.tut_p2));
             }
             return rootView;
         }
@@ -108,8 +107,7 @@ public class IntroActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
@@ -119,8 +117,6 @@ public class IntroActivity extends AppCompatActivity {
                     return "SECTION 1";
                 case 1:
                     return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
             }
             return null;
         }
