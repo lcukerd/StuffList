@@ -4,7 +4,6 @@ pic disappears after switching app.
 add on screen button to go back
 Remove image from gallery
 image not saved if rotated while closing camera
-clicking on delete, deletes image before pressing on update.
 */
 
 import android.app.Activity;
@@ -180,15 +179,13 @@ public class addItem extends AppCompatActivity {
                                 if (showpopup == true) {
                                     if (info[3].charAt(0)!='a')
                                         deleteimage(info[3]);
-                                    else
-                                        info[3] = null;
+                                    info[3] = null;
                                     showpopup = false ;
                                 } else
                                 {
                                     if (photoURI.toString().charAt(0)!='a')
                                         deleteimage(photoURI.toString());
-                                    else
-                                        photoURI = null;
+                                    photoURI = null;
                                 }
 
                                 recreate();
@@ -205,6 +202,7 @@ public class addItem extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
+                photoURI=null;
                 camerastarted=false;
                 finish();
             }
@@ -212,10 +210,13 @@ public class addItem extends AppCompatActivity {
         more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ((photoURI==null)&&(caller.equals("list")))
+                if ((photoURI==null)&&(caller.equals("list"))&&(info[3]!=null))
                     interact.save(eventName,Sname.getText().toString(),taken,returned,Uri.parse(info[3]),caller,id);
+                else if ((photoURI==null)&&(caller.equals("list")))
+                    interact.save(eventName,Sname.getText().toString(),taken,returned,null,caller,id);
                 else
                     interact.save(eventName,Sname.getText().toString(),taken,returned,photoURI,caller,id);
+                photoURI=null;
                 camerastarted=false;
                 Sname.setText("");
                 taken.setChecked(false);
@@ -230,6 +231,16 @@ public class addItem extends AppCompatActivity {
             onWindowFocusChanged(true);
 
     }
+
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (photoURI!=null) {
+            deleteimage(photoURI.toString());
+            Log.d("Destroy", "Deleteing extra image");
+        }
+    }
+
 
     protected void onActivityResult(int requestCode,int resultCode,Intent data)
     {

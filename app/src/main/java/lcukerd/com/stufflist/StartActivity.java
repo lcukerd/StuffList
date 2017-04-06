@@ -1,6 +1,7 @@
 package lcukerd.com.stufflist;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,6 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
@@ -66,6 +69,13 @@ public class StartActivity extends AppCompatActivity {
         order = updateorder(order);
 
         setContentView(R.layout.activity_start);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setName();
+            }
+        });
 
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -118,15 +128,34 @@ public class StartActivity extends AppCompatActivity {
             values = new ContentValues();
             values.put(eventDBcontract.ListofItem.columnEvent,"Titorizl");
             db.insert(eventDBcontract.ListofItem.tableName,null,values);
-            for (int i=0;i<12;i++) {
+            String itemnames[] = {"Headphone","Shoes","Sunglasses","Towel","Scarf","First aid kit","Charger","Laptop","Comb"};
+            for (int i=0;i<9;i++) {
                 values = new ContentValues();
-                adddummyitem("Item " + String.valueOf(i), i % 2, i % 3, R.drawable.d1 + i);
-                db.insert(eventDBcontract.ListofItem.tableName,null,values);
+                adddummyitem(itemnames[i], i % 2, i % 3, R.drawable.d1 + i);
+                db.insert(eventDBcontract.ListofItem.tableName, null, values);
             }
             startActivity(new Intent(this,IntroActivity.class));
         }
+        else if (id == R.id.about)
+            startActivity(new Intent(this,about.class));
+        else if (id == R.id.review) {
+            Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            // To count with Play market backstack, After pressing back button,
+            // to taken back to our application, we need to add following flags to intent.
+            goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            try {
+                startActivity(goToMarket);
+            } catch (ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+            }
+        }
             return super.onOptionsItemSelected(item);
     }
+
     public void adddummyitem(String name,int t,int r,int id)
     {
         values.put(eventDBcontract.ListofItem.columnEvent,"Sample");

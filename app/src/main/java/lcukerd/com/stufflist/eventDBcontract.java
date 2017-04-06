@@ -29,6 +29,7 @@ public class eventDBcontract extends SQLiteOpenHelper{
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Stuff.db";
+    String item[] = {"Headphone","Shoes","Sunglasses","Towel","Scarf","First aid kit","Charger","Laptop","Comb"};
 
     public eventDBcontract(Context context)
     {
@@ -41,10 +42,10 @@ public class eventDBcontract extends SQLiteOpenHelper{
          values = new ContentValues();
          values.put(eventDBcontract.ListofItem.columnEvent,"Titorizl");
          db.insert(eventDBcontract.ListofItem.tableName,null,values);
-         for (int i=0;i<12;i++) {
+         for (int i=0;i<9;i++) {
              values = new ContentValues();
-             adddummyitem("Item " + String.valueOf(i), i % 2, i % 3, R.drawable.d1 + i);
-             db.insert(eventDBcontract.ListofItem.tableName,null,values);
+             adddummyitem(item[i], i % 2, i % 3, R.drawable.d1 + i);
+             db.insert(eventDBcontract.ListofItem.tableName, null, values);
          }
 
      }

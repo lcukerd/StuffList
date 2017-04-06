@@ -19,4 +19,9 @@
     <string name="tut_p1">Make a list of items needed in a clean and sleek UI.</string>
     <string name="tut_p2_H">Don"'"t forget to bring back your items!</string>
     <string name="tut_p2">Taking item is only half of job, make sure you bring it back.</string>
+    <string name="about">More functionality and better UI will be added later as I learn. \n \nRemember, Remember the LCUKERD.
+    </string>
+    <string name="report">Found a bug or share an idea.</string>
+    <string name="action_about">About</string>
+    <string name="action_review">Rate the app</string>
 </resources>

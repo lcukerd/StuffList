@@ -18,7 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
+import static android.widget.RelativeLayout.ALIGN_PARENT_END;
 
 public class IntroActivity extends AppCompatActivity {
 
@@ -33,6 +37,7 @@ public class IntroActivity extends AppCompatActivity {
         Log.d("IntroActivity","started");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Stuff List");
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -88,6 +93,20 @@ public class IntroActivity extends AppCompatActivity {
             {
                 Heading.setText(getString(R.string.tut_p2_H));
                 Description.setText(getString(R.string.tut_p2));
+                Button end = new Button(getContext());
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(ALIGN_PARENT_BOTTOM);
+                params.addRule(ALIGN_PARENT_END);
+                end.setLayoutParams(params);
+                end.setText("Go!!");
+                end.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getActivity().finish();
+                    }
+                });
+                RelativeLayout relativeLayout = (RelativeLayout) rootView.findViewById(R.id.introlayout);
+                relativeLayout.addView(end);
             }
             return rootView;
         }

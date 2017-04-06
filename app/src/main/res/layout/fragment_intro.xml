@@ -2,11 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/introlayout"
     android:background="@android:color/holo_purple"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    tools:showIn="@layout/activity_intro"
     tools:context="lcukerd.com.stufflist.IntroActivity$PlaceholderFragment">
 
     <TextView
@@ -31,5 +33,6 @@
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
         android:textSize="24sp" />
+
 
 </RelativeLayout>

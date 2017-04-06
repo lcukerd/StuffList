@@ -1,5 +1,6 @@
 package lcukerd.com.stufflist;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -65,14 +67,28 @@ public class showList extends AppCompatActivity {
     {
         super.onResume();
 
+        setContentView(R.layout.activity_show_list);                                                    //change to activity_show_list and remove fabs
+                                                                                                    //part of code to fix small icon problem
+
         j=0;
+        Log.d("List","started");
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(this);
         String order = preferences.getString("pref_item_order",getString(R.string.defaultvai));
         order = updateorder(order);
 
-        setContentView(R.layout.activity_show_list);
         getSupportActionBar().setTitle(data);
         gridLayout = (GridLayout) findViewById(R.id.grid);
+
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabl);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent addItem = new Intent(getApplicationContext(),addItem.class);
+                addItem.putExtra("eventName",data);
+                addItem.putExtra("calledby","main");
+                startActivity(addItem);
+            }
+        });*/
 
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -96,7 +112,7 @@ public class showList extends AppCompatActivity {
         else
         {
             columns=3;
-            h= metrics.widthPixels/columns;
+            h= (2*metrics.widthPixels)/columns;
             w= metrics.widthPixels/columns;
             gridLayout.setColumnCount(columns);
             l1 = new LinearLayout(this);
@@ -199,8 +215,24 @@ public class showList extends AppCompatActivity {
             startActivity(new Intent(this,orderitem.class));
             return true;
         }
-        else
-            return super.onOptionsItemSelected(item);
+        else if (id == R.id.about)
+            startActivity(new Intent(this,about.class));
+        else if (id == R.id.review) {
+            Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            // To count with Play market backstack, After pressing back button,
+            // to taken back to our application, we need to add following flags to intent.
+            goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            try {
+                startActivity(goToMarket);
+            } catch (ActivityNotFoundException e) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     class loadList extends AsyncTask<String,Void,String[]>
@@ -211,7 +243,6 @@ public class showList extends AppCompatActivity {
         {
             tw = w;
             th = h;
-
             if (data[3].length()>=2)
                 if ((data[3].charAt(0)=='#')&&(data[3].charAt(1)=='%'))
                 {
@@ -220,7 +251,6 @@ public class showList extends AppCompatActivity {
                     this.cancel(true);
                     return data;                                                                    //return statement
                 }
-            Log.d("id",String.valueOf(data[4]));
 
             if(data[2]!=null) {
                 try {
@@ -231,10 +261,16 @@ public class showList extends AppCompatActivity {
                     else
                         photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/2,metrics.widthPixels/2,false);
                     Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
-                    if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
+                    if (metrics.heightPixels>metrics.widthPixels)
                     {
                         th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
                         Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
+                    }
+                    else
+                    {
+                        th =(int) ( tw* ( ((float)photo.getWidth()) / ((float)photo.getHeight())));
+                        Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
+
                     }
                     ob = new BitmapDrawable(getResources(), photo);                  //else pic was displayed over text
 
@@ -402,8 +438,7 @@ public class showList extends AppCompatActivity {
             {
                 if (specialid==null)
                 {
-                    interact.save(data[5],"#%",new CheckBox(context),new CheckBox
-                    (           context),null,"main","0");
+                    interact.save(data[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
                 }
             }
         }
