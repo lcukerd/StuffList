@@ -24,10 +24,11 @@ public class eventDBcontract extends SQLiteOpenHelper{
                     ListofItem.columntaken + " INTEGER," +
                     ListofItem.columnreturn + " INTEGER, " +
                     ListofItem.columnFileloc + " TEXT, " +
-                    ListofItem.columndatetime + " INTEGER );";
+                    ListofItem.columndatetime + " INTEGER, " +
+                    ListofItem.columnnotes + " TEXT );";
     private ContentValues values;
 
-    public static final int DATABASE_VERSION = 1;
+    public static int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "Stuff.db";
     String item[] = {"Headphone","Shoes","Sunglasses","Towel","Scarf","First aid kit","Charger","Laptop","Comb"};
 
@@ -64,9 +65,13 @@ public class eventDBcontract extends SQLiteOpenHelper{
          Calendar c = Calendar.getInstance();
          return c.getTimeInMillis();
      }
-
      public void onUpgrade(SQLiteDatabase db,int oldVersion , int newVersion)
      {
+         switch (newVersion)
+         {
+             case 2:
+                 db.execSQL("ALTER TABLE "+ListofItem.tableName+" ADD COLUMN " + ListofItem.columnnotes + " TEXT");
+         }
          Log.d("Database","upgraded");
      }
 
@@ -79,6 +84,7 @@ public class eventDBcontract extends SQLiteOpenHelper{
                 columnreturn = "Item_brought_back",
                 columnName = "Name_of_Item",
                 columnFileloc = "File_Location",
-                columndatetime = "Creation_millisec";
+                columndatetime = "Creation_millisec",
+                columnnotes = "Note";
     }
 }

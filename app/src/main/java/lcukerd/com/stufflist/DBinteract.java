@@ -28,7 +28,8 @@ public class DBinteract {
             eventDBcontract.ListofItem.columntaken,
             eventDBcontract.ListofItem.columnreturn,
             eventDBcontract.ListofItem.columnFileloc,
-            eventDBcontract.ListofItem.columndatetime
+            eventDBcontract.ListofItem.columndatetime,
+            eventDBcontract.ListofItem.columnnotes
     };
 
     DBinteract(Context context)
@@ -50,7 +51,8 @@ public class DBinteract {
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc))+" "+
-                    cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columndatetime)));
+                    cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columndatetime))+" "+
+                    cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes)));
         }
 
         cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,eventDBcontract.ListofItem.columnEvent,null,order);
