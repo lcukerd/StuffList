@@ -7,8 +7,9 @@
     <string name="order_title">Order By</string>
     <string name="order_date_asc">Last updated on bottom</string>
     <string name="order_date_desc">Last updated on top</string>
-    <string name="order_name_asc">Event name Alphabetically</string>
-    <string name="order_name_desc">Event name reverse Alphabetically</string>
+    <string name="order_name_asc">Alphabetically</string>
+    <string name="order_name_desc">Reverse Alphabetically</string>
+    <string name="order_forgot">Left item on top</string>
     <string name="defaultvae">date_desc_event</string>
     <string name="defaultvai">date_desc_item</string>
     <string name="add_note">Add note</string>

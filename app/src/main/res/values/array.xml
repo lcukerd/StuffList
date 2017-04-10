@@ -6,6 +6,13 @@
         <item>@string/order_name_asc</item>
         <item>@string/order_name_desc</item>
     </array>
+    <array name="order_choices_item">
+        <item>@string/order_date_asc</item>
+        <item>@string/order_date_desc</item>
+        <item>@string/order_name_asc</item>
+        <item>@string/order_name_desc</item>
+        <item>@string/order_forgot</item>
+    </array>
     <array name="order_values_event">
         <item>date_asc_event</item>
         <item>date_desc_event</item>
@@ -17,5 +24,6 @@
         <item>date_desc_item</item>
         <item>name_asc_item</item>
         <item>name_desc_item</item>
+        <item>forgot</item>
     </array>
 </resources>

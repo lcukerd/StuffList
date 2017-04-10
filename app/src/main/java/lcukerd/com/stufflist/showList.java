@@ -1,5 +1,8 @@
 package lcukerd.com.stufflist;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -10,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -28,8 +32,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
@@ -37,6 +43,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class showList extends AppCompatActivity {
 
@@ -55,6 +66,10 @@ public class showList extends AppCompatActivity {
     private FrameLayout frameLayout;
     private DisplayMetrics metrics;
     private Context context = this;
+    private Calendar myCalendar = Calendar.getInstance();
+    private SimpleDateFormat sdf;
+    private String hometime=null,hoteltime=null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,10 +141,25 @@ public class showList extends AppCompatActivity {
             gridLayout.addView(l3);
         }
         cursor = interact.readinEvent(data,order);
+        v =  View.inflate(this,R.layout.customnote,null);
+        frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+        FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,FrameLayout.LayoutParams.WRAP_CONTENT);
+        frameLayout.setLayoutParams(param);
+        final EditText schedulescheck = (EditText) v.findViewById(R.id.addnote);
+        schedulescheck.setText("Add event schedule");
+        schedulescheck.setFocusable(false);
+        schedulescheck.setClickable(false);
+        schedulescheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scheduler();
+            }
+        });
+        l3.addView(frameLayout);
 
         v =  View.inflate(this,R.layout.customnote,null);
         frameLayout = (FrameLayout) v.findViewById(R.id.frame);
-        FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,h/3);
+        param = new FrameLayout.LayoutParams(w,h/3);
         frameLayout.setLayoutParams(param);
         notes = (EditText) v.findViewById(R.id.addnote);
         notes.setOnTouchListener(new View.OnTouchListener() {
@@ -157,25 +187,92 @@ public class showList extends AppCompatActivity {
         while(cursor.moveToNext())                                                                  // To display list
         {
             bklistgene =  new loadList();
-            final String infoDB[]= new String[6];
+            final String infoDB[]= new String[7];
             infoDB[0] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken));
             infoDB[1] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn));
             infoDB[2] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc));
             infoDB[3] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
             infoDB[4] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
             infoDB[5] = data;
+            infoDB[6] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes));
             if(cursor.isLast())
-                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],"last");
+                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],infoDB[6],"last");
             else
-                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],"not last");
+                bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],infoDB[6],"not last");
         }
 
+    }
+
+    private void scheduler()
+    {
+        final AlertDialog.Builder eventName = new AlertDialog.Builder(context,R.style.dialogStyle);
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService (Context.LAYOUT_INFLATER_SERVICE);
+        View dialogb = inflater.inflate(R.layout.dialog_schedule, null);
+        eventName.setView(dialogb);
+        final AlertDialog dialog = eventName.create();
+        dialog.show();
+        Button home = (Button) dialogb.findViewById(R.id.home);
+        Button hotel = (Button) dialogb.findViewById(R.id.hotel);
+
+        if (hometime!=null)
+            home.setText(hometime);
+        if (hoteltime!=null)
+            hotel.setText(hoteltime);
+        showdialog(home);
+        showdialog(hotel);
+    }
+
+    private void showdialog(final Button btn)
+    {
+        final DatePickerDialog.OnDateSetListener datehome = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                final String myFormat = "h:mm a, EEE, d MMM yyyy";
+                sdf = new SimpleDateFormat(myFormat);
+                int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
+                int minute = myCalendar.get(Calendar.MINUTE);
+                TimePickerDialog timepicker =new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        myCalendar.set(Calendar.HOUR_OF_DAY,selectedHour);
+                        myCalendar.set(Calendar.MINUTE,selectedMinute);
+                        btn.setText(sdf.format(myCalendar.getTime()));
+                        if (btn.getId()==R.id.home)
+                        {
+                            Log.d("home time",String.valueOf(myCalendar.getTimeInMillis()));
+                            hometime = sdf.format(myCalendar.getTime());
+                            interact.saveEvent(data,notes.getText().toString(),myCalendar.getTimeInMillis(),-1,specialid);
+                        }
+                        else {
+                            hoteltime = sdf.format(myCalendar.getTime());
+                            interact.saveEvent(data, notes.getText().toString(), -1, myCalendar.getTimeInMillis(), specialid);
+                        }
+                    }
+
+                }, hour, minute, true);
+                timepicker.show();
+            }
+
+        };
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(context, datehome, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
     }
 
     protected  void onStop()
     {
         super.onStop();
-        interact.saveEvent(data,notes.getText().toString(),0,0,specialid);
+        interact.saveEvent(data,notes.getText().toString(),-1,-1,specialid);
     }
     public String updateorder(String order)
     {
@@ -187,6 +284,8 @@ public class showList extends AppCompatActivity {
             order = eventDBcontract.ListofItem.columnName+" ASC";
         else if (order.equals("name_desc_item"))
             order = eventDBcontract.ListofItem.columnName+" DESC";
+        else if (order.equals("forgot"))
+            order = eventDBcontract.ListofItem.columntaken+" ASC";                                  //add condition to order by taken or return
         return order;
     }
     private void deleteimage(String imageloc)
@@ -312,14 +411,18 @@ public class showList extends AppCompatActivity {
                         Log.d("Long Click","successful");
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
-                        final PopupWindow pw = new PopupWindow(layout, 400 * (metrics.widthPixels/1080) , 400, true);
+                        final PopupWindow pw = new PopupWindow(layout, 700 * (metrics.widthPixels/1080) , 300 * (metrics.heightPixels/1080) , true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
                         pw.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent)));
                         pw.setOutsideTouchable(true);
                         pw.showAtLocation(v, Gravity.NO_GRAVITY, coord[0] + 50 ,coord[1]+100);
+
                         Button del = (Button) layout.findViewById(R.id.del);
                         Button viewImage = (Button) layout.findViewById(R.id.view);
+                        final EditText notes = (EditText) layout.findViewById(R.id.note);
+                        notes.setText(data[6]);
+
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -330,6 +433,7 @@ public class showList extends AppCompatActivity {
                                 recreate();                                                         //add option to delete files as well
                             }
                         });
+
                         viewImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -340,6 +444,14 @@ public class showList extends AppCompatActivity {
                                     pw.dismiss();
                                     startActivity(intent);
                                 }
+                            }
+                        });
+
+                        pw.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                            @Override
+                            public void onDismiss() {
+                                Log.d("popop window", "onDismiss: " + notes.getText().toString());
+                                interact.savenote(data[4],notes.getText().toString());
                             }
                         });
 
@@ -434,7 +546,7 @@ public class showList extends AppCompatActivity {
                 l2.addView(v);
                 i++;
             }
-            if (data[6].equals("last"))
+            if (data[7].equals("last"))
             {
                 if (specialid==null)
                 {
@@ -445,7 +557,21 @@ public class showList extends AppCompatActivity {
         protected void onCancelled(String data[])
         {
             notes.setText(data[3].substring(2));
+            final String myFormat = "h:mm a, EEE, d MMM yyyy";
+            sdf = new SimpleDateFormat(myFormat);
+            if (data[0].equals("0")==false)
+            {
+                Calendar calendartemp = Calendar.getInstance();
+                calendartemp.setTimeInMillis(Long.parseLong(data[0]));
+                hometime = sdf.format(calendartemp.getTime());
+            }
+            if (data[1].equals("0")==false)
+            {
+                Calendar calendartemp = Calendar.getInstance();
+                calendartemp.setTimeInMillis(Long.parseLong(data[1]));
+                hoteltime = sdf.format(calendartemp.getTime());
+            }
         }
-    }
 
+    }
 }

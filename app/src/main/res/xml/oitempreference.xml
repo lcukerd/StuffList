@@ -7,7 +7,7 @@
         android:layout_alignParentStart="true"
         android:key="pref_item_order"
         android:title="@string/order_title"
-        android:entries="@array/order_choices"
+        android:entries="@array/order_choices_item"
         android:entryValues="@array/order_values_item"
         android:defaultValue="@string/defaultvai"/>
 </PreferenceScreen>

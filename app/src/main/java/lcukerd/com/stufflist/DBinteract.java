@@ -117,12 +117,24 @@ public class DBinteract {
 
         values.put(eventDBcontract.ListofItem.columnEvent,eventName);
         values.put(eventDBcontract.ListofItem.columnName,"#%"+itemName);
-        values.put(eventDBcontract.ListofItem.columntaken,start);
-        values.put(eventDBcontract.ListofItem.columnreturn,end);
+        if (start!=-1)
+            values.put(eventDBcontract.ListofItem.columntaken,start);
+        if (end!=-1)
+            values.put(eventDBcontract.ListofItem.columnreturn,end);
 
         db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
 
         Log.d("save operation","Event detail complete");
+    }
+    public void savenote(String id , String note)
+    {
+        ContentValues values = new ContentValues();
+        SQLiteDatabase db = dBcontract.getWritableDatabase();
+
+        values.put(eventDBcontract.ListofItem.columnnotes,note);
+        db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
+        Log.d("Interact","add note complete");
+
     }
     private long getmillis()
     {

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
+    android:id="@+id/pop"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/pop">
+    android:background="#39000000"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/del"
@@ -12,6 +14,7 @@
         android:layout_below="@+id/view"
         android:text="delete" />
 
+
     <Button
         android:id="@+id/view"
         android:layout_width="wrap_content"
@@ -19,5 +22,19 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:text="View Image" />
+
+
+    <EditText
+        android:id="@+id/note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/del"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/view"
+        android:ems="10"
+        android:hint="Add note for this item"
+        android:inputType="textMultiLine"
+        android:textAlignment="viewStart"
+        android:textColor="@android:color/background_light" />
 
 </RelativeLayout>
