@@ -1,13 +1,17 @@
 package lcukerd.com.stufflist;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -18,6 +22,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -69,6 +74,9 @@ public class showList extends AppCompatActivity {
     private Calendar myCalendar = Calendar.getInstance();
     private SimpleDateFormat sdf;
     private String hometime=null,hoteltime=null;
+    private AlarmManager notifalm;
+    int ti=0;
+    int ri=0;
 
 
     @Override
@@ -184,6 +192,8 @@ public class showList extends AppCompatActivity {
         Log.d("no. of rows",String.valueOf(cursor.getCount()-1));
         loadList bklistgene;
 
+        ti=0;
+        ri=0;
         while(cursor.moveToNext())                                                                  // To display list
         {
             bklistgene =  new loadList();
@@ -195,6 +205,10 @@ public class showList extends AppCompatActivity {
             infoDB[4] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
             infoDB[5] = data;
             infoDB[6] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes));
+            if (infoDB[0].equals("0"))
+                ti++;
+            if (infoDB[1].equals("0"))
+                ri++;
             if(cursor.isLast())
                 bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],infoDB[6],"last");
             else
@@ -210,6 +224,7 @@ public class showList extends AppCompatActivity {
         View dialogb = inflater.inflate(R.layout.dialog_schedule, null);
         eventName.setView(dialogb);
         final AlertDialog dialog = eventName.create();
+        dialog.setTitle("When will you leave");
         dialog.show();
         Button home = (Button) dialogb.findViewById(R.id.home);
         Button hotel = (Button) dialogb.findViewById(R.id.hotel);
@@ -242,15 +257,26 @@ public class showList extends AppCompatActivity {
                         myCalendar.set(Calendar.HOUR_OF_DAY,selectedHour);
                         myCalendar.set(Calendar.MINUTE,selectedMinute);
                         btn.setText(sdf.format(myCalendar.getTime()));
+                        int itemLeft;
                         if (btn.getId()==R.id.home)
                         {
-                            Log.d("home time",String.valueOf(myCalendar.getTimeInMillis()));
                             hometime = sdf.format(myCalendar.getTime());
+                            itemLeft = ti;
                             interact.saveEvent(data,notes.getText().toString(),myCalendar.getTimeInMillis(),-1,specialid);
                         }
                         else {
+                            itemLeft = ri;
                             hoteltime = sdf.format(myCalendar.getTime());
                             interact.saveEvent(data, notes.getText().toString(), -1, myCalendar.getTimeInMillis(), specialid);
+                        }
+                        if (myCalendar.getTimeInMillis()> System.currentTimeMillis()) {
+                            Intent alarmclass = new Intent(context, notifier.class);
+                            alarmclass.putExtra("Event", data);
+                            Log.d("List: ","itemleft " + String.valueOf(itemLeft));
+                            alarmclass.putExtra("Items_left", String.valueOf(itemLeft));
+                            alarmclass.setAction(data);                                             //To distinguish between alarms for diff event
+                            PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, alarmclass, 0);
+                            setalarm(alarmIntent);
                         }
                     }
 
@@ -268,7 +294,12 @@ public class showList extends AppCompatActivity {
             }
         });
     }
-
+    void setalarm(PendingIntent al)
+    {
+        Log.d("time set",String.valueOf((myCalendar.getTimeInMillis()- System.currentTimeMillis())>3600000?myCalendar.getTimeInMillis()-3600000:(System.currentTimeMillis()+36000)));
+        notifalm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        notifalm.setExact(AlarmManager.RTC_WAKEUP,((myCalendar.getTimeInMillis()- System.currentTimeMillis())>3600000?myCalendar.getTimeInMillis()-3600000:(System.currentTimeMillis()+36000)),al);
+    }
     protected  void onStop()
     {
         super.onStop();

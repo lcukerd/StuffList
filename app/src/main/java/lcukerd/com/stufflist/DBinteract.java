@@ -1,7 +1,9 @@
 package lcukerd.com.stufflist;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.DateFormat;
@@ -21,7 +23,7 @@ import java.util.Date;
 public class DBinteract {
 
     private eventDBcontract dBcontract ;
-    private         String[] projection = {
+    private String[] projection = {
             eventDBcontract.ListofItem.columnID,
             eventDBcontract.ListofItem.columnEvent,
             eventDBcontract.ListofItem.columnName,
@@ -31,15 +33,18 @@ public class DBinteract {
             eventDBcontract.ListofItem.columndatetime,
             eventDBcontract.ListofItem.columnnotes
     };
+    private Context contextp;
 
     DBinteract(Context context)
     {
+        contextp=context;
         dBcontract = new eventDBcontract(context);
     }
 
     public String[] readfromDB(String order)
     {
         SQLiteDatabase db = dBcontract.getReadableDatabase();
+        int n=0;
 
         Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,null,null,order);
 
@@ -53,7 +58,29 @@ public class DBinteract {
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columndatetime))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes)));
+            if (Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn)))>System.currentTimeMillis())
+                n=1;
         }
+        if (n==0)
+        {
+            Log.d("Interact","No alarm");
+            ComponentName receiver = new ComponentName(contextp, startonBoot.class);
+            PackageManager pm = contextp.getPackageManager();
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
+        else
+        {
+            Log.d("Interact","Few alarm");
+            ComponentName receiver = new ComponentName(contextp, startonBoot.class);
+            PackageManager pm = contextp.getPackageManager();
+
+            pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
+
 
         cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,eventDBcontract.ListofItem.columnEvent,null,order);
 
