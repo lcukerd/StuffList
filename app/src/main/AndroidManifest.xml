@@ -7,8 +7,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -55,14 +54,18 @@
             android:name=".IntroActivity"
             android:label="@string/title_activity_intro"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".about"></activity>
-        <receiver android:name=".startonBoot"
+        <activity android:name=".about" />
+
+        <receiver
+            android:name=".startonBoot"
             android:enabled="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".notifier"></receiver>
+        <receiver android:name=".notifier" />
+
+        <activity android:name=".updateLog"></activity>
     </application>
 
 </manifest>

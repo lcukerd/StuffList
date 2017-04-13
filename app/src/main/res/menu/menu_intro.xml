@@ -3,11 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="lcukerd.com.stufflist.IntroActivity">
     <item
-        android:title="add"
-        android:orderInCategory="103"
         android:id="@+id/action_add"
-        app:showAsAction="always"
-        android:icon="@android:drawable/ic_input_add" />
+        android:icon="@drawable/ic_library_add_black_24dp"
+        android:orderInCategory="105"
+        android:title="add"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_schedule"
+        android:icon="@drawable/ic_watch_later_black_24dp"
+        android:orderInCategory="103"
+        android:title="Schedule"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="104"
@@ -24,6 +30,12 @@
         android:id="@+id/review"
         android:orderInCategory="104"
         android:title="@string/action_review"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/log"
+        android:orderInCategory="104"
+        android:title="@string/action_log"
         app:showAsAction="never"
         />
 </menu>

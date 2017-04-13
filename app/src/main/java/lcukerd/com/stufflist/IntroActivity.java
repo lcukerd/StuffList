@@ -18,11 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
 import static android.widget.RelativeLayout.ALIGN_PARENT_END;
+import static android.widget.RelativeLayout.CENTER_HORIZONTAL;
 
 public class IntroActivity extends AppCompatActivity {
 
@@ -88,6 +90,15 @@ public class IntroActivity extends AppCompatActivity {
             if (getArguments().getInt(ARG_SECTION_NUMBER)==1) {
                 Heading.setText(getString(R.string.tut_p1_H));
                 Description.setText(getString(R.string.tut_p1));
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(ALIGN_PARENT_BOTTOM);
+                params.addRule(CENTER_HORIZONTAL);
+                params.setMargins(0,0,0,35);
+                ImageView imageView = new ImageView(getContext());
+                imageView.setBackgroundResource(R.drawable.swipe);
+                imageView.setLayoutParams(params);
+                RelativeLayout layout = (RelativeLayout) rootView.findViewById(R.id.introlayout);
+                layout.addView(imageView);
             }
             else if (getArguments().getInt(ARG_SECTION_NUMBER)==2)
             {

@@ -58,8 +58,9 @@ public class DBinteract {
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnFileloc))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columndatetime))+" "+
                     cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes)));
-            if (Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn)))>System.currentTimeMillis())
-                n=1;
+            if (cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))!=null)
+                if (Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn)))>System.currentTimeMillis())
+                    n=1;
         }
         if (n==0)
         {
@@ -160,7 +161,7 @@ public class DBinteract {
 
         values.put(eventDBcontract.ListofItem.columnnotes,note);
         db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
-        Log.d("Interact","add note complete");
+        Log.d("Interact","add note complete " + note);
 
     }
     private long getmillis()

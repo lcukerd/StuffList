@@ -3,6 +3,9 @@
     <string name="order_by">order by</string>
     <string name="action_settings">Settings</string>
     <string name="action_tutorial">Start Tutorial</string>
+    <string name="action_about">About</string>
+    <string name="action_review">Rate the app</string>
+    <string name="action_log">Update Log</string>
 
     <string name="order_title">Order By</string>
     <string name="order_date_asc">Last updated on bottom</string>
@@ -14,6 +17,7 @@
     <string name="defaultvai">date_desc_item</string>
     <string name="add_note">Add note</string>
 
+    <string name="notification_instruct">You will get reminder notification, about items left, an hour before you leave home and hotel.</string>
     <string name="title_activity_show_pic">showPic</string>
     <string name="title_activity_intro">IntroActivity</string>
     <string name="tut_p1_H">Going on a trip/event?</string>
@@ -23,6 +27,8 @@
     <string name="about">More functionality and better UI will be added later as I learn. \n \nRemember, Remember the LCUKERD.
     </string>
     <string name="report">Found a bug or share an idea.</string>
-    <string name="action_about">About</string>
-    <string name="action_review">Rate the app</string>
+    <string name="log_disp">v1.2 \n1. Added option to store travel schedule. \n2. Notification to remind about items left an hour before departure from home and hotel. \n3. Added option to add note to items. \n4. Added instruction to swipe on starting screen. \n
+    v1.0 \nInitial Release
+    </string>
+
 </resources>

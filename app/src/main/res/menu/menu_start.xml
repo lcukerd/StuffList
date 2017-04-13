@@ -27,4 +27,10 @@
         android:title="@string/action_review"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/log"
+        android:orderInCategory="108"
+        android:title="@string/action_log"
+        app:showAsAction="never"
+        />
 </menu>

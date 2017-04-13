@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -49,6 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -149,25 +151,10 @@ public class showList extends AppCompatActivity {
             gridLayout.addView(l3);
         }
         cursor = interact.readinEvent(data,order);
-        v =  View.inflate(this,R.layout.customnote,null);
-        frameLayout = (FrameLayout) v.findViewById(R.id.frame);
-        FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,FrameLayout.LayoutParams.WRAP_CONTENT);
-        frameLayout.setLayoutParams(param);
-        final EditText schedulescheck = (EditText) v.findViewById(R.id.addnote);
-        schedulescheck.setText("Add event schedule");
-        schedulescheck.setFocusable(false);
-        schedulescheck.setClickable(false);
-        schedulescheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scheduler();
-            }
-        });
-        l3.addView(frameLayout);
 
         v =  View.inflate(this,R.layout.customnote,null);
         frameLayout = (FrameLayout) v.findViewById(R.id.frame);
-        param = new FrameLayout.LayoutParams(w,h/3);
+        FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(w,h/3);
         frameLayout.setLayoutParams(param);
         notes = (EditText) v.findViewById(R.id.addnote);
         notes.setOnTouchListener(new View.OnTouchListener() {
@@ -185,6 +172,7 @@ public class showList extends AppCompatActivity {
             }
         });
         l3.addView(frameLayout);
+
 
         c3=h/3;
         int tw=0,th=0;
@@ -226,6 +214,17 @@ public class showList extends AppCompatActivity {
         final AlertDialog dialog = eventName.create();
         dialog.setTitle("When will you leave");
         dialog.show();
+        if ((hometime == null)&&(hoteltime == null)) {
+            final AlertDialog.Builder instruct = new AlertDialog.Builder(this);
+            instruct.setMessage(R.string.notification_instruct)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog instructd = instruct.create();
+            instructd.show();
+        }
         Button home = (Button) dialogb.findViewById(R.id.home);
         Button hotel = (Button) dialogb.findViewById(R.id.hotel);
 
@@ -362,6 +361,10 @@ public class showList extends AppCompatActivity {
                         Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
             }
         }
+        else if (id == R.id.log)
+            startActivity(new Intent(this,updateLog.class));
+        else if (id == R.id.action_schedule)
+            scheduler();
         return super.onOptionsItemSelected(item);
     }
 
@@ -579,6 +582,10 @@ public class showList extends AppCompatActivity {
             }
             if (data[7].equals("last"))
             {
+                if ((hometime==null)&&(hoteltime==null)) {
+                    Toast schreminder = Toast.makeText(context, "Add Schedule for notification support (from top).", Toast.LENGTH_LONG);
+                    schreminder.show();
+                }
                 if (specialid==null)
                 {
                     interact.save(data[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");

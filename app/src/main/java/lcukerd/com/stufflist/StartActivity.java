@@ -153,7 +153,9 @@ public class StartActivity extends AppCompatActivity {
                         Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
             }
         }
-            return super.onOptionsItemSelected(item);
+        else if (id == R.id.log)
+            startActivity(new Intent(this,updateLog.class));
+        return super.onOptionsItemSelected(item);
     }
 
     public void adddummyitem(String name,int t,int r,int id)
