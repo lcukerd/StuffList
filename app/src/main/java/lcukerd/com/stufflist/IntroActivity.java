@@ -1,5 +1,7 @@
 package lcukerd.com.stufflist;
 
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -85,7 +87,10 @@ public class IntroActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
+            GradientDrawable gd = new GradientDrawable();
             TextView Heading = (TextView) rootView.findViewById(R.id.heading) , Description  = (TextView) rootView.findViewById(R.id.desc);
+            gd.setColor(Color.rgb(238, 238, 238)); // Changes this drawbale to use a single color instead of a gradient
+            gd.setCornerRadius(10);
             //Button go = (Button) rootView.findViewById(R.id.go);
             if (getArguments().getInt(ARG_SECTION_NUMBER)==1) {
                 Heading.setText(getString(R.string.tut_p1_H));
@@ -110,6 +115,7 @@ public class IntroActivity extends AppCompatActivity {
                 params.addRule(ALIGN_PARENT_END);
                 end.setLayoutParams(params);
                 end.setText("Go!!");
+                end.setBackground(gd);
                 end.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

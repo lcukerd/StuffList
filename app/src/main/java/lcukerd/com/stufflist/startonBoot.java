@@ -35,28 +35,16 @@ public class startonBoot extends BroadcastReceiver {
             {
                 long t = Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))),
                      r = Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn)));
-                if (event.equals(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent))))
-                {
-                    if (t==0)
-                        ti++;
-                    if (r==0)
-                        ri++;
-                }
-                else
-                {
-                    Log.d("startonBoot ",event + ": " + String.valueOf(ti) + " " + String.valueOf(ri));
-                    event = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent));
-                    ti=0;
-                    ri=0;
-                }
 
                 if (t>System.currentTimeMillis()) {
-                    PendingIntent al = createintent(context,cursor,ti);
+                    PendingIntent al = createintent(context,cursor,"leave");
+                    Log.d("startonboot:","leave " + String.valueOf(t) );
                     notifalm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                     notifalm.setExact(AlarmManager.RTC_WAKEUP, ((t - System.currentTimeMillis()) > 3600000 ? t - 3600000 : (System.currentTimeMillis() + 36000)), al);
                 }
                 if (r>System.currentTimeMillis()) {
-                    PendingIntent al = createintent(context,cursor,ri);
+                    PendingIntent al = createintent(context,cursor,"return");
+                    Log.d("startonboot:","return " + String.valueOf(r) );
                     notifalm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                     notifalm.setExact(AlarmManager.RTC_WAKEUP, ((r - System.currentTimeMillis()) > 3600000 ? r - 3600000 : (System.currentTimeMillis() + 36000)), al);
                 }
@@ -65,11 +53,11 @@ public class startonBoot extends BroadcastReceiver {
 
         }
     }
-    PendingIntent createintent(Context context,Cursor cursor,int n)
+    PendingIntent createintent(Context context,Cursor cursor,String n)
     {
         Intent alarmclass = new Intent(context, notifier.class);
         alarmclass.putExtra("Event", cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent)));
-        alarmclass.putExtra("Items_left", String.valueOf(n));
+        alarmclass.putExtra("partoftrip", n );
         alarmclass.setAction(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent)));                                             //To distinguish between alarms for diff event
         PendingIntent al = PendingIntent.getBroadcast(context, 0, alarmclass, 0);
         return al;

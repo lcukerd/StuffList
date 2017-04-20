@@ -2,6 +2,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:background="#e0e0e0"
     android:layout_height="match_parent">
 
     <TextView
@@ -11,5 +12,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:text="@string/log_disp"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"
+        android:textColor="@android:color/black" />
 </ScrollView>

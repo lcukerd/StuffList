@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,9 +35,14 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import static android.graphics.Color.parseColor;
 
 
 public class StartActivity extends AppCompatActivity {
@@ -209,14 +217,39 @@ public class StartActivity extends AppCompatActivity {
 
     private void UpdateScrollView(final String NameofEvents[])                                      // reads array of string to display list of events
     {
-        Button events;
+        //Button events;
+        GradientDrawable gd = new GradientDrawable();
+        gd.setColor(Color.rgb(171, 0, 13)); // Changes this drawbale to use a single color instead of a gradient
+        gd.setCornerRadius(10);
+        gd.setStroke(1, Color.rgb(171, 0, 13));
+        LinearLayout.LayoutParams eventparam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        eventparam.setMargins(0,10,0,10);
+        String colorbar[] = {"#35e544","#3e35e5","#e59035","#e53584"};
+        int c=0;
+        View v;
+
         for (int i=0;i<NameofEvents.length;i++) {
             if (NameofEvents[i].equals("Titorizl") == false) {
-                events = new Button(this);
 
+                /*events = new Button(this);
                 events.setGravity(View.TEXT_DIRECTION_LTR);
+                events.setText("  " + NameofEvents[i]);
+                events.setTextSize(16);
+                events.setBackgroundColor(Color.rgb(224, 224, 224));
+                events.setTransformationMethod(null);
+                //events.setBackground(gd);
+                events.setTextColor(Color.rgb(0,0,0));
+                //events.setLayoutParams(eventparam);
+                linearLayout.addView(events);*/
+                v =  View.inflate(this,R.layout.start_element,null);
+                Button events = (Button) v.findViewById(R.id.event_start);
                 events.setText(NameofEvents[i]);
-                linearLayout.addView(events);
+                events.setTransformationMethod(null);
+                events.setBackgroundColor(Color.rgb(224, 224, 224));
+                events.setTextColor(Color.rgb(0,0,0));
+                ImageView vcolor = (ImageView)v.findViewById(R.id.color_start);
+                vcolor.setBackgroundColor(parseColor(colorbar[(c++)%4]));
+                linearLayout.addView(v);
                 final int ch = i;
                 events.setOnClickListener(new View.OnClickListener() {
                     @Override

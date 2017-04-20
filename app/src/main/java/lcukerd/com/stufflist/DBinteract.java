@@ -102,7 +102,35 @@ public class DBinteract {
         Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,eventDBcontract.ListofItem.columnEvent+" = '"+event+"'",null,null,null,order);
         return cursor;
     }
+    public String readNote(String id)
+    {
+        SQLiteDatabase db = dBcontract.getReadableDatabase();
+        Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,eventDBcontract.ListofItem.columnID+" = "+id,null,null,null,null);
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes));
 
+    }
+
+    public int readstatus(String eventName)
+    {
+        SQLiteDatabase db = dBcontract.getReadableDatabase();
+        Cursor cursor = db.query(eventDBcontract.ListofItem.tableName,projection,eventDBcontract.ListofItem.columnEvent+" = '"+eventName+"'",null,null,null,eventDBcontract.ListofItem.columnName+" ASC");
+        while(cursor.moveToNext())
+        {
+            String data = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnName));
+            if (data.length()>=2)
+                if ((data.charAt(0)=='#')&&(data.charAt(1)=='%'))
+                {
+                    if (System.currentTimeMillis()<Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columntaken))))
+                        return 0;
+                    else if (System.currentTimeMillis()<Long.parseLong(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnreturn))))
+                        return 1;
+                    else
+                        return 0;
+                }
+        }
+        return 0;
+    }
 
     public void save(String eventName, String itemName, CheckBox taken, CheckBox returned, Uri photoURI , String caller , String id)
     {
@@ -160,7 +188,7 @@ public class DBinteract {
         SQLiteDatabase db = dBcontract.getWritableDatabase();
 
         values.put(eventDBcontract.ListofItem.columnnotes,note);
-        db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
+        Log.d("Interact",String.valueOf(db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id})));
         Log.d("Interact","add note complete " + note);
 
     }

@@ -4,13 +4,13 @@
     tools:context="lcukerd.com.stufflist.IntroActivity">
     <item
         android:id="@+id/action_add"
-        android:icon="@drawable/ic_library_add_black_24dp"
+        android:icon="@drawable/add_item"
         android:orderInCategory="105"
         android:title="add"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_schedule"
-        android:icon="@drawable/ic_watch_later_black_24dp"
+        android:icon="@drawable/add_sch"
         android:orderInCategory="103"
         android:title="Schedule"
         app:showAsAction="always" />

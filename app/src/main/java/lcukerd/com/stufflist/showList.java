@@ -21,10 +21,12 @@ import android.graphics.drawable.ColorDrawable;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -77,6 +79,7 @@ public class showList extends AppCompatActivity {
     private SimpleDateFormat sdf;
     private String hometime=null,hoteltime=null;
     private AlarmManager notifalm;
+    private Boolean showtoast;
     int ti=0;
     int ri=0;
 
@@ -86,6 +89,7 @@ public class showList extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        showtoast=true;
         data = intent.getStringExtra("Event_Name");
     }
     protected void onResume()
@@ -193,10 +197,13 @@ public class showList extends AppCompatActivity {
             infoDB[4] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnID));
             infoDB[5] = data;
             infoDB[6] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnnotes));
-            if (infoDB[0].equals("0"))
-                ti++;
-            if (infoDB[1].equals("0"))
-                ri++;
+            if (infoDB[3].length()>=2)
+                if ((infoDB[3].charAt(0)=='#')&&(infoDB[3].charAt(1)=='%')) {
+                    if (infoDB[0].equals("0"))
+                        ti++;
+                    if ((infoDB[0].equals("1")) && (infoDB[1].equals("0")))
+                        ri++;
+                }
             if(cursor.isLast())
                 bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],infoDB[6],"last");
             else
@@ -256,23 +263,25 @@ public class showList extends AppCompatActivity {
                         myCalendar.set(Calendar.HOUR_OF_DAY,selectedHour);
                         myCalendar.set(Calendar.MINUTE,selectedMinute);
                         btn.setText(sdf.format(myCalendar.getTime()));
+                        Intent alarmclass = new Intent(context, notifier.class);
                         int itemLeft;
                         if (btn.getId()==R.id.home)
                         {
                             hometime = sdf.format(myCalendar.getTime());
                             itemLeft = ti;
                             interact.saveEvent(data,notes.getText().toString(),myCalendar.getTimeInMillis(),-1,specialid);
+                            alarmclass.putExtra("partoftrip", "leave" );
                         }
                         else {
                             itemLeft = ri;
                             hoteltime = sdf.format(myCalendar.getTime());
                             interact.saveEvent(data, notes.getText().toString(), -1, myCalendar.getTimeInMillis(), specialid);
+                            alarmclass.putExtra("partoftrip", "return");
                         }
                         if (myCalendar.getTimeInMillis()> System.currentTimeMillis()) {
-                            Intent alarmclass = new Intent(context, notifier.class);
+
                             alarmclass.putExtra("Event", data);
                             Log.d("List: ","itemleft " + String.valueOf(itemLeft));
-                            alarmclass.putExtra("Items_left", String.valueOf(itemLeft));
                             alarmclass.setAction(data);                                             //To distinguish between alarms for diff event
                             PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, alarmclass, 0);
                             setalarm(alarmIntent);
@@ -297,7 +306,8 @@ public class showList extends AppCompatActivity {
     {
         Log.d("time set",String.valueOf((myCalendar.getTimeInMillis()- System.currentTimeMillis())>3600000?myCalendar.getTimeInMillis()-3600000:(System.currentTimeMillis()+36000)));
         notifalm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        notifalm.setExact(AlarmManager.RTC_WAKEUP,((myCalendar.getTimeInMillis()- System.currentTimeMillis())>3600000?myCalendar.getTimeInMillis()-3600000:(System.currentTimeMillis()+36000)),al);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notifalm.setExact(AlarmManager.RTC_WAKEUP,((myCalendar.getTimeInMillis()- System.currentTimeMillis())>3600000?myCalendar.getTimeInMillis()-3600000:(System.currentTimeMillis()+36000)),al);
     }
     protected  void onStop()
     {
@@ -306,6 +316,7 @@ public class showList extends AppCompatActivity {
     }
     public String updateorder(String order)
     {
+        int status = interact.readstatus(data);
         if (order.equals("date_asc_item"))
             order = eventDBcontract.ListofItem.columndatetime+" ASC";
         else if (order.equals("date_desc_item"))
@@ -314,8 +325,12 @@ public class showList extends AppCompatActivity {
             order = eventDBcontract.ListofItem.columnName+" ASC";
         else if (order.equals("name_desc_item"))
             order = eventDBcontract.ListofItem.columnName+" DESC";
-        else if (order.equals("forgot"))
-            order = eventDBcontract.ListofItem.columntaken+" ASC";                                  //add condition to order by taken or return
+        else if ((order.equals("forgot"))&&(status==0))
+            order = eventDBcontract.ListofItem.columntaken+" ASC";
+        else if ((order.equals("forgot"))&&(status==1))
+            order = eventDBcontract.ListofItem.columnreturn+" ASC";
+        Log.d("Order",String.valueOf(status));
+
         return order;
     }
     private void deleteimage(String imageloc)
@@ -349,8 +364,6 @@ public class showList extends AppCompatActivity {
         else if (id == R.id.review) {
             Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
             Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-            // To count with Play market backstack, After pressing back button,
-            // to taken back to our application, we need to add following flags to intent.
             goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
                     Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
                     Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -372,6 +385,9 @@ public class showList extends AppCompatActivity {
     {
         private BitmapDrawable ob;
         private int tw,th;
+        private String notedata;
+        private ImageView notif_note;
+
         protected String[] doInBackground(String data[])
         {
             tw = w;
@@ -390,9 +406,9 @@ public class showList extends AppCompatActivity {
 
                     Bitmap photo = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(data[2]));
                     if (photo.getHeight()>photo.getWidth())
-                        photo = Bitmap.createScaledBitmap(photo,metrics.widthPixels/2,metrics.heightPixels/2,false);
+                        photo = Bitmap.createScaledBitmap(photo,metrics.widthPixels/3,metrics.heightPixels/3,false);
                     else
-                        photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/2,metrics.widthPixels/2,false);
+                        photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/3,metrics.widthPixels/3,false);
                     Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
                     if (metrics.heightPixels>metrics.widthPixels)
                     {
@@ -420,7 +436,7 @@ public class showList extends AppCompatActivity {
             return data;
 
         }
-        protected void onPostExecute(final String data[])
+        protected void onPostExecute(final String datat[])
         {
             v =  View.inflate(context,R.layout.trying,null);
             frameLayout = (FrameLayout) v.findViewById(R.id.frame);
@@ -431,18 +447,22 @@ public class showList extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(),addItem.class);
-                    intent.putExtra("eventName",data[5]);
+                    intent.putExtra("eventName",datat[5]);
                     intent.putExtra("calledby","list");
-                    intent.putExtra("available data",new String[]{ data[3] , data[0] , data[1] , data[2] , data[4] });
+                    intent.putExtra("available data",new String[]{ datat[3] , datat[0] , datat[1] , datat[2] , datat[4] });
                     startActivity(intent);
                 }
             });
-            final String thisimageuri = data[2];
+            final String thisimageuri = datat[2];
+            notif_note = (ImageView) v.findViewById(R.id.note_notif);
+            if ((datat[6]!=null)&&(datat[6].equals("")==false))
+                notif_note.setImageResource(R.drawable.ic_label_black_24dp);
             cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     try {
                         Log.d("Long Click","successful");
+                        datat[6] = interact.readNote(datat[4]);
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
                         final PopupWindow pw = new PopupWindow(layout, 700 * (metrics.widthPixels/1080) , 300 * (metrics.heightPixels/1080) , true);
@@ -455,7 +475,8 @@ public class showList extends AppCompatActivity {
                         Button del = (Button) layout.findViewById(R.id.del);
                         Button viewImage = (Button) layout.findViewById(R.id.view);
                         final EditText notes = (EditText) layout.findViewById(R.id.note);
-                        notes.setText(data[6]);
+                        notes.setText(datat[6]);
+                        notedata = datat[6];
 
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -463,7 +484,7 @@ public class showList extends AppCompatActivity {
                                 SQLiteDatabase db = dBcontract.getWritableDatabase();
                                 if ((thisimageuri!=null)&&(thisimageuri.toString().charAt(0)!='a'))
                                     deleteimage(thisimageuri);
-                                Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+data[4],null)));
+                                Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+datat[4],null)));
                                 recreate();                                                         //add option to delete files as well
                             }
                         });
@@ -475,6 +496,7 @@ public class showList extends AppCompatActivity {
                                 {
                                     Intent intent = new Intent(getApplicationContext(),showPic.class);
                                     intent.putExtra("photo uri",thisimageuri);
+                                    notedata = notes.getText().toString();
                                     pw.dismiss();
                                     startActivity(intent);
                                 }
@@ -484,8 +506,13 @@ public class showList extends AppCompatActivity {
                         pw.setOnDismissListener(new PopupWindow.OnDismissListener() {
                             @Override
                             public void onDismiss() {
-                                Log.d("popop window", "onDismiss: " + notes.getText().toString());
-                                interact.savenote(data[4],notes.getText().toString());
+                                notedata = notes.getText().toString();
+                                if ((notedata!=null)&&(notedata.equals("")==false))
+                                    notif_note.setImageResource(R.drawable.ic_label_black_24dp);
+                                else
+                                    notif_note.setImageBitmap(null);
+                                Log.d("popop window", "onDismiss: " + notedata);
+                                interact.savenote(datat[4],notedata);
                             }
                         });
 
@@ -504,40 +531,40 @@ public class showList extends AppCompatActivity {
             taken.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (data[0].equals(String.valueOf(taken.isChecked()))==false)
+                    if (datat[0].equals(String.valueOf(taken.isChecked()))==false)
                     {
-                        if (data[2]!=null)
-                            interact.save(data[5],Ename.getText().toString(),taken,returned,Uri.parse(data[2]),"update",data[4]);
+                        if (datat[2]!=null)
+                            interact.save(datat[5],Ename.getText().toString(),taken,returned,Uri.parse(datat[2]),"update",datat[4]);
                         else
-                            interact.save(data[5],Ename.getText().toString(),taken,returned,null,"update",data[4]);
+                            interact.save(datat[5],Ename.getText().toString(),taken,returned,null,"update",datat[4]);
                     }
                 }
             });
             returned.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (data[1].equals(String.valueOf(returned.isChecked()))==false)
+                    if (datat[1].equals(String.valueOf(returned.isChecked()))==false)
                     {
-                        if (data[2]!=null)
-                            interact.save(data[5],Ename.getText().toString(),taken,returned,Uri.parse(data[2]),"update",data[4]);
+                        if (datat[2]!=null)
+                            interact.save(datat[5],Ename.getText().toString(),taken,returned,Uri.parse(datat[2]),"update",datat[4]);
                         else
-                            interact.save(data[5],Ename.getText().toString(),taken,returned,null,"update",data[4]);
+                            interact.save(datat[5],Ename.getText().toString(),taken,returned,null,"update",datat[4]);
                     }
                 }
             });
-            if (data[2]!=null)
+            if (datat[2]!=null)
                 Eimage.setBackground(ob);
 
             frameLayout.setLayoutParams(new FrameLayout.LayoutParams(tw,th));
 
-            if (data[3].equals("")==false)
-                Ename.setText(data[3]);                                                                    //adds data in card
+            if (datat[3].equals("")==false)
+                Ename.setText(datat[3]);                                                                    //adds data in card
 
-            if (data[0].equals(String.valueOf(1)))
+            if (datat[0].equals(String.valueOf(1)))
                 taken.setChecked(true);
             else
                 taken.setChecked(false);
-            if (data[1].equals(String.valueOf(1)))
+            if (datat[1].equals(String.valueOf(1)))
                 returned.setChecked(true);
             else
                 returned.setChecked(false);
@@ -580,15 +607,16 @@ public class showList extends AppCompatActivity {
                 l2.addView(v);
                 i++;
             }
-            if (data[7].equals("last"))
+            if (datat[7].equals("last"))
             {
-                if ((hometime==null)&&(hoteltime==null)) {
-                    Toast schreminder = Toast.makeText(context, "Add Schedule for notification support (from top).", Toast.LENGTH_LONG);
+                if ((hometime==null)&&(hoteltime==null)&&(showtoast==true)) {
+                    Toast schreminder = Toast.makeText(context, "Add Schedule for notification support (from top).", Toast.LENGTH_SHORT);
                     schreminder.show();
+                    showtoast=false;
                 }
                 if (specialid==null)
                 {
-                    interact.save(data[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
+                    interact.save(datat[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
                 }
             }
         }

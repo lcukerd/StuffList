@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,6 +85,8 @@ public class addItem extends AppCompatActivity {
             Intent tutorial = new Intent(this, showPic.class);
             tutorial.putExtra("photo uri", "tutorial");
             startActivity(tutorial);
+            Toast delpic = Toast.makeText(this,"Some phones save copy of image taken from app in gallery, You can safely delete it from there. ",Toast.LENGTH_LONG);
+            delpic.show();
         }}
         catch (Exception e)
         {
