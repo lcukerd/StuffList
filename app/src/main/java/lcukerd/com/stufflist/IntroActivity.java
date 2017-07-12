@@ -68,7 +68,8 @@ public class IntroActivity extends AppCompatActivity {
     }
 
 
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment
+    {
 
         private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -84,8 +85,8 @@ public class IntroActivity extends AppCompatActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
             View rootView = inflater.inflate(R.layout.fragment_intro, container, false);
             GradientDrawable gd = new GradientDrawable();
             TextView Heading = (TextView) rootView.findViewById(R.id.heading) , Description  = (TextView) rootView.findViewById(R.id.desc);
@@ -130,7 +131,8 @@ public class IntroActivity extends AppCompatActivity {
     }
 
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter
+    {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

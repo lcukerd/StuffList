@@ -26,8 +26,10 @@ import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -260,6 +262,9 @@ public class StartActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                TypedValue outValue = new TypedValue();
+                this.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+                events.setBackgroundResource(outValue.resourceId);
                 events.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
