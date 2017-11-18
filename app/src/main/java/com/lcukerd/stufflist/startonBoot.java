@@ -1,4 +1,4 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist;
 
 
 import android.app.AlarmManager;
@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.lcukerd.stufflist.database.eventDBcontract;
 
 /**
  * Created by Programmer on 11-04-2017.

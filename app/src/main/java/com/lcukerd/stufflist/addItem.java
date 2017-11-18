@@ -1,4 +1,4 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist;
 /*
 pic disappears after switching app.
 add on screen button to go back
@@ -11,11 +11,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -32,15 +34,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.lcukerd.stufflist.database.DBinteract;
+import com.lcukerd.stufflist.database.eventDBcontract;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static android.widget.RelativeLayout.ALIGN_BASELINE;
 import static android.widget.RelativeLayout.ALIGN_BOTTOM;
@@ -77,20 +81,16 @@ public class addItem extends AppCompatActivity {
         add = getIntent();
         eventName = add.getStringExtra("eventName");
         caller = add.getStringExtra("calledby");
-        String nameOfevents[] = interact.readfromDB(eventDBcontract.ListofItem.columndatetime+" ASC");
-        try
-        {if (nameOfevents[0].equals("Titorizl")) {
+        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(this);
+        if (preferences.getBoolean("intialLaunchAdd", true))
+        {
             SQLiteDatabase db = dBcontract.getWritableDatabase();
-            Log.d("delete operation",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnEvent+" = "+"'"+nameOfevents[0]+"'",null)));
             Intent tutorial = new Intent(this, showPic.class);
             tutorial.putExtra("photo uri", "tutorial");
             startActivity(tutorial);
             Toast delpic = Toast.makeText(this,"Some phones save copy of image taken from app in gallery, You can safely delete it from there. ",Toast.LENGTH_LONG);
             delpic.show();
-        }}
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            preferences.edit().putBoolean("intialLaunchAdd", false).commit();
         }
     }
 
@@ -382,7 +382,7 @@ public class addItem extends AppCompatActivity {
                         }
                         if (photoFile!=null)
                         {
-                            photoURIc = FileProvider.getUriForFile(context,"lcukerd.com.android.fileprovider",photoFile);
+                            photoURIc = FileProvider.getUriForFile(context,"com.lcukerd.android.fileprovider",photoFile);
                             startCamera.putExtra(MediaStore.EXTRA_OUTPUT,photoURIc);
                             camerastarted=true;
                             startActivityForResult(startCamera,CAMERA_REQUEST);

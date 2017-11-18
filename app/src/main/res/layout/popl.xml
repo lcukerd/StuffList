@@ -23,12 +23,22 @@
         android:layout_alignParentTop="true"
         android:text="View Image" />
 
+    <Button
+        android:id="@+id/share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/del"
+        android:text="Share" />
+
+
+
 
     <EditText
         android:id="@+id/note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/del"
+        android:layout_alignBottom="@+id/share"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/view"
         android:ems="10"

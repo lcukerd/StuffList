@@ -1,9 +1,8 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +11,9 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+
+import com.lcukerd.stufflist.database.DBinteract;
+import com.lcukerd.stufflist.database.eventDBcontract;
 
 /**
  * Created by Programmer on 10-04-2017.
@@ -29,7 +31,7 @@ public class notifier extends WakefulBroadcastReceiver{
                         .setContentTitle("Items Left for " + intent.getStringExtra("Event"));
 
         DBinteract interact = new DBinteract(context);
-        Cursor cursor = interact.readinEvent(intent.getStringExtra("Event"),eventDBcontract.ListofItem.columndatetime+" ASC");
+        Cursor cursor = interact.readinEvent(intent.getStringExtra("Event"), eventDBcontract.ListofItem.columndatetime+" ASC");
         String infoDB[] = new String[3];
         int ti = 0, ri = 0;
         Log.d("notification",String.valueOf(cursor.getCount()));

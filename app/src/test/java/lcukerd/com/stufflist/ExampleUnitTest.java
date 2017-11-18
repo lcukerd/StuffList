@@ -1,4 +1,4 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist;
 
 import org.junit.Test;
 

@@ -1,12 +1,13 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
+
+import com.lcukerd.stufflist.R;
 
 import java.util.Calendar;
 
@@ -41,8 +42,6 @@ public class eventDBcontract extends SQLiteOpenHelper{
          db.execSQL(SQL_CREATE_ENTRIES);
          Log.d("Database","created");
          values = new ContentValues();
-         values.put(eventDBcontract.ListofItem.columnEvent,"Titorizl");
-         db.insert(eventDBcontract.ListofItem.tableName,null,values);
          for (int i=0;i<9;i++) {
              values = new ContentValues();
              adddummyitem(item[i], i % 2, i % 3, R.drawable.d1 + i);
@@ -57,7 +56,7 @@ public class eventDBcontract extends SQLiteOpenHelper{
          values.put(eventDBcontract.ListofItem.columndatetime,getmillis());
          values.put(eventDBcontract.ListofItem.columntaken,String.valueOf(t));
          values.put(eventDBcontract.ListofItem.columnreturn,String.valueOf(r));
-         Uri path = Uri.parse("android.resource://lcukerd.com.stufflist/" + id);
+         Uri path = Uri.parse("android.resource://com.lcukerd.stufflist/" + id);
          values.put(eventDBcontract.ListofItem.columnFileloc, path.toString());
      }
      private long getmillis()

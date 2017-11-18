@@ -1,4 +1,4 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -6,13 +6,11 @@ import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -22,11 +20,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,7 +36,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;;
 import android.widget.DatePicker;
@@ -54,9 +49,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.lcukerd.stufflist.database.DBinteract;
+import com.lcukerd.stufflist.database.eventDBcontract;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class showList extends AppCompatActivity {
 
@@ -465,7 +464,7 @@ public class showList extends AppCompatActivity {
                         datat[6] = interact.readNote(datat[4]);
                         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                         View layout = inflater.inflate(R.layout.popl,(ViewGroup)findViewById(R.id.pop));
-                        final PopupWindow pw = new PopupWindow(layout, 700 * (metrics.widthPixels/1080) , 300 * (metrics.heightPixels/1080) , true);
+                        final PopupWindow pw = new PopupWindow(layout, 700 * (metrics.widthPixels/1080) , 450 * (metrics.heightPixels/1080) , true);
                         int coord[]= new int[2];
                         v.getLocationOnScreen(coord);
                         pw.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent)));
@@ -474,6 +473,7 @@ public class showList extends AppCompatActivity {
 
                         Button del = (Button) layout.findViewById(R.id.del);
                         Button viewImage = (Button) layout.findViewById(R.id.view);
+                        Button share = (Button) layout.findViewById(R.id.share);
                         final EditText notes = (EditText) layout.findViewById(R.id.note);
                         notes.setText(datat[6]);
                         notedata = datat[6];
@@ -500,6 +500,35 @@ public class showList extends AppCompatActivity {
                                     pw.dismiss();
                                     startActivity(intent);
                                 }
+                            }
+                        });
+
+                        share.setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View v)
+                            {
+                                if (thisimageuri!=null)
+                                {
+                                    Uri uriForFile = null;
+                                    try {
+                                        File file = new File(Environment.getExternalStorageDirectory() + "/" +  "temporary.jpg");
+                                        FileOutputStream out = new FileOutputStream(file);
+                                        uriForFile = Uri.fromFile(file);
+                                        MediaStore.Images.Media.getBitmap(showList.this.getContentResolver(), Uri.parse(thisimageuri))
+                                                .compress(Bitmap.CompressFormat.PNG, 100, out);
+                                    } catch (Exception e) {
+                                        Log.e("Show List","File creation error",e);
+                                    }
+                                    Intent share = new Intent(Intent.ACTION_SEND);
+                                    share.putExtra(Intent.EXTRA_STREAM, uriForFile);
+                                    if (datat[3].equals("")==false)
+                                        share.putExtra(Intent.EXTRA_TEXT, datat[3]);
+                                    share.setType("*/*");
+                                    startActivity(Intent.createChooser(share, "Share Item"));
+                                }
+                                else
+                                    Toast.makeText(showList.this, "No image to share", Toast.LENGTH_SHORT).show();
                             }
                         });
 

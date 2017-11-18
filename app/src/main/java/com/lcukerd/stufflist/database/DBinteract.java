@@ -1,4 +1,4 @@
-package lcukerd.com.stufflist;
+package com.lcukerd.stufflist.database;
 
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -6,15 +6,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.CheckBox;
 
-import java.text.ParseException;
+import com.lcukerd.stufflist.startonBoot;
+
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Programmer on 13-03-2017.
@@ -35,13 +34,13 @@ public class DBinteract {
     };
     private Context contextp;
 
-    DBinteract(Context context)
+    public DBinteract(Context context)
     {
         contextp=context;
         dBcontract = new eventDBcontract(context);
     }
 
-    public String[] readfromDB(String order)
+    public ArrayList<String> readfromDB(String order)
     {
         SQLiteDatabase db = dBcontract.getReadableDatabase();
         int n=0;
@@ -86,10 +85,10 @@ public class DBinteract {
         cursor = db.query(eventDBcontract.ListofItem.tableName,projection,null,null,eventDBcontract.ListofItem.columnEvent,null,order);
 
         int i=0;
-        String NameofEvents[] = new String[cursor.getCount()];
+        ArrayList<String> NameofEvents = new ArrayList<>();
         while(cursor.moveToNext())
         {
-            NameofEvents[i] = cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent));
+            NameofEvents.add(cursor.getString(cursor.getColumnIndex(eventDBcontract.ListofItem.columnEvent)));
             i++;
         }
         return (NameofEvents);
