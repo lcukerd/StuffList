@@ -304,7 +304,7 @@ public class addItem extends AppCompatActivity
                         try
                         {
                             File image = createImageFile();
-                            photoURI = FileProvider.getUriForFile(context, "com.lcukerd.android.fileprovider", image);
+                            photoURI = FileProvider.getUriForFile(context, "lcukerd.com.android.fileprovider", image);
                             out = new FileOutputStream(image);
                             deleteimageupdate = false;
                             photo.compress(Bitmap.CompressFormat.PNG, 100, out);

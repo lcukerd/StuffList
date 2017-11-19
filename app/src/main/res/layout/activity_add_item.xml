@@ -7,6 +7,15 @@
     android:layout_height="match_parent"
     tools:context="com.lcukerd.stufflist.addItem">
 
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="145dp"
+        android:text="Tap to add/change pic (optional)"/>
+
     <ImageButton
         android:id="@+id/Simage"
         android:layout_width="match_parent"
@@ -16,14 +25,15 @@
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        app:srcCompat="@drawable/ic_photo_black_24dp"/>
+        app:srcCompat="@drawable/ic_insert_photo_black_48dp"/>
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/relativeLayout">
+        android:elevation="3dp">
 
         <EditText
             android:id="@+id/Sname"
@@ -32,8 +42,9 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:ems="15"
-            android:hint="Name of Item"
-            android:inputType="textPersonName"/>
+            android:hint="Title (optional)"
+            android:inputType="textCapSentences"
+            android:singleLine="true"/>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_bottom"
