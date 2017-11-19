@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Stuff List</string>
-    <string name="order_by">order by</string>
+    <string name="tap_hold">Tap and Hold an event to remove it.</string>
+    <string name="order_by">sort by</string>
     <string name="action_settings">Settings</string>
     <string name="action_tutorial">Start Tutorial</string>
     <string name="action_about">About</string>

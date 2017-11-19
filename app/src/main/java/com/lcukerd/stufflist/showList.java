@@ -557,7 +557,7 @@ public class showList extends AppCompatActivity {
             final CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
             final ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
 
-            taken.setOnClickListener(new View.OnClickListener() {
+            /*taken.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (datat[0].equals(String.valueOf(taken.isChecked()))==false)
@@ -580,7 +580,7 @@ public class showList extends AppCompatActivity {
                             interact.save(datat[5],Ename.getText().toString(),taken,returned,null,"update",datat[4]);
                     }
                 }
-            });
+            });*/
             if (datat[2]!=null)
                 Eimage.setBackground(ob);
 
@@ -645,7 +645,7 @@ public class showList extends AppCompatActivity {
                 }
                 if (specialid==null)
                 {
-                    interact.save(datat[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
+                    //interact.save(datat[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
                 }
             }
         }

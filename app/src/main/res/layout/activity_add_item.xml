@@ -5,66 +5,45 @@
     android:id="@+id/activity_add_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lcukerd.stufflist.addItem">
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/taken"
-        android:layout_marginTop="39sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/back"
-        android:layout_alignBaseline="@+id/taken"
-        android:layout_alignBottom="@+id/taken"
-        android:layout_toEndOf="@+id/taken"
-        android:layout_marginStart="17sp" />
 
     <ImageButton
         android:id="@+id/Simage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/Sname"
-        android:layout_marginTop="47sp"
-        android:layout_toEndOf="@+id/back"
-        app:srcCompat="@android:drawable/ic_input_add"
-        android:layout_above="@+id/more" />
+        android:layout_above="@+id/relativeLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/ic_photo_black_24dp"/>
 
-    <EditText
-        android:id="@+id/Sname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Name of Item"
-        android:inputType="textPersonName"
-        android:ems="15"
-        android:layout_marginEnd="19sp"
-        android:layout_alignBaseline="@+id/back"
-        android:layout_alignBottom="@+id/back"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/finish" />
-
-    <Button
-        android:id="@+id/more"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add more"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/finish"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:text="That's all" />
+        android:id="@+id/relativeLayout">
+
+        <EditText
+            android:id="@+id/Sname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:ems="15"
+            android:hint="Name of Item"
+            android:inputType="textPersonName"/>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/Sname"
+            />
+
+    </RelativeLayout>
+
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 
 import com.lcukerd.stufflist.startonBoot;
@@ -94,7 +95,6 @@ public class DBinteract {
         return (NameofEvents);
     }
 
-
     public Cursor readinEvent(String event,String order)
     {
         SQLiteDatabase db = dBcontract.getReadableDatabase();
@@ -131,11 +131,13 @@ public class DBinteract {
         return 0;
     }
 
-    public void save(String eventName, String itemName, CheckBox taken, CheckBox returned, Uri photoURI , String caller , String id)
+    public void save(String eventName, String itemName, MenuItem taken, MenuItem returned, Uri photoURI , String caller , String id)
     {
         SQLiteDatabase db = dBcontract.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        if (Character.isAlphabetic(eventName.charAt(0)))
+            eventName = eventName.replace(eventName.charAt(0),Character.toUpperCase(eventName.charAt(0)));
         values.put(eventDBcontract.ListofItem.columnEvent,eventName);
         values.put(eventDBcontract.ListofItem.columnName,itemName);
         values.put(eventDBcontract.ListofItem.columndatetime,getmillis());

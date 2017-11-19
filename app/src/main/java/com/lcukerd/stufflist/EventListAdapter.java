@@ -151,16 +151,16 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
                             break;
                         }
                     }
-                    Log.d(tag,"Index is " + String.valueOf(index));
+                    Log.d(tag, "Index is " + String.valueOf(index));
                     if (tempList.size() > eventList.size())
                         notifyItemRemoved(index);
                     else if (eventList.size() > tempList.size())
                         notifyItemInserted(index);
                 } catch (IndexOutOfBoundsException e)
                 {
-                    Log.e(tag,"Index out of bound");
+                    Log.e(tag, "Index out of bound");
                     if (tempList.size() > eventList.size())
-                        notifyItemRemoved(length-1);
+                        notifyItemRemoved(length - 1);
                 }
             }
         }
