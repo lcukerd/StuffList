@@ -2,15 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_done_all"
-        android:icon="@drawable/ic_done_all_white_24dp"
-        android:orderInCategory="106"
-        android:title="Done adding"
+        android:id="@+id/action_rotate"
+        android:icon="@drawable/ic_rotate_right_white_24dp"
+        android:orderInCategory="104"
+        android:title="Rotate 90"
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_done"
         android:icon="@drawable/ic_done_white_24dp"
         android:orderInCategory="105"
         android:title="Add more"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_done_all"
+        android:icon="@drawable/ic_done_all_white_24dp"
+        android:orderInCategory="106"
+        android:title="Done adding"
         app:showAsAction="always"/>
 </menu>

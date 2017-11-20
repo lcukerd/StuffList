@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ import com.lcukerd.stufflist.database.eventDBcontract;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -79,6 +81,7 @@ public class showList extends AppCompatActivity {
     private String hometime=null,hoteltime=null;
     private AlarmManager notifalm;
     private Boolean showtoast;
+    public static Boolean recreateActivity = false;
     int ti=0;
     int ri=0;
 
@@ -90,14 +93,24 @@ public class showList extends AppCompatActivity {
         Intent intent = getIntent();
         showtoast=true;
         data = intent.getStringExtra("Event_Name");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        recreateActivity();
     }
-    protected void onResume()
+
+    protected void onStart()
     {
-        super.onResume();
-
-        setContentView(R.layout.activity_show_list);                                                    //change to activity_show_list and remove fabs
-                                                                                                    //part of code to fix small icon problem
-
+        super.onStart();
+        if (recreateActivity)
+        {
+            recreateActivity = false;
+            recreateActivity();
+        }
+    }
+    void recreateActivity()
+    {
+        setContentView(R.layout.activity_show_list);                                                //change to activity_show_list and remove fabs
+        //part of code to fix small icon problem
         j=0;
         Log.d("List","started");
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(this);
@@ -208,7 +221,12 @@ public class showList extends AppCompatActivity {
             else
                 bklistgene.execute(infoDB[0],infoDB[1],infoDB[2],infoDB[3],infoDB[4],infoDB[5],infoDB[6],"not last");
         }
-
+    }
+    @Override
+    public boolean onSupportNavigateUp()
+    {
+        onBackPressed();
+        return true;
     }
 
     private void scheduler()
@@ -311,6 +329,7 @@ public class showList extends AppCompatActivity {
     protected  void onStop()
     {
         super.onStop();
+        Log.d("showList","Stopping " + notes.getText().toString());
         interact.saveEvent(data,notes.getText().toString(),-1,-1,specialid);
     }
     public String updateorder(String order)
@@ -356,6 +375,7 @@ public class showList extends AppCompatActivity {
         else if (id == R.id.action_settings)
         {
             startActivity(new Intent(this,orderitem.class));
+            recreateActivity = true;
             return true;
         }
         else if (id == R.id.about)
@@ -439,6 +459,10 @@ public class showList extends AppCompatActivity {
         {
             v =  View.inflate(context,R.layout.trying,null);
             frameLayout = (FrameLayout) v.findViewById(R.id.frame);
+            final TextView Ename = (TextView) v.findViewById(R.id.textView);
+            final CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
+            final ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
+
 
             cardView = (CardView) v.findViewById(R.id.cardSample);
 
@@ -449,7 +473,9 @@ public class showList extends AppCompatActivity {
                     intent.putExtra("eventName",datat[5]);
                     intent.putExtra("calledby","list");
                     intent.putExtra("available data",new String[]{ datat[3] , datat[0] , datat[1] , datat[2] , datat[4] });
-                    startActivity(intent);
+                    ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(showList.this,Eimage,"commonimage");
+                    startActivity(intent,optionsCompat.toBundle());
+                    //startActivity(intent);
                 }
             });
             final String thisimageuri = datat[2];
@@ -485,7 +511,8 @@ public class showList extends AppCompatActivity {
                                 if ((thisimageuri!=null)&&(thisimageuri.toString().charAt(0)!='a'))
                                     deleteimage(thisimageuri);
                                 Log.d("delete operaiton",String.valueOf(db.delete(eventDBcontract.ListofItem.tableName,eventDBcontract.ListofItem.columnID+" = "+datat[4],null)));
-                                recreate();                                                         //add option to delete files as well
+                                pw.dismiss();
+                                recreateActivity();                                                         //add option to delete files as well
                             }
                         });
 
@@ -498,7 +525,9 @@ public class showList extends AppCompatActivity {
                                     intent.putExtra("photo uri",thisimageuri);
                                     notedata = notes.getText().toString();
                                     pw.dismiss();
-                                    startActivity(intent);
+                                    ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(showList.this,Eimage,"commonimage");
+                                    startActivity(intent,optionsCompat.toBundle());
+                                    //startActivity(intent);
                                 }
                             }
                         });
@@ -508,11 +537,12 @@ public class showList extends AppCompatActivity {
                             @Override
                             public void onClick(View v)
                             {
+                                pw.dismiss();
                                 if (thisimageuri!=null)
                                 {
                                     Uri uriForFile = null;
                                     try {
-                                        File file = new File(Environment.getExternalStorageDirectory() + "/" +  "temporary.jpg");
+                                        File file = createImageFile();
                                         FileOutputStream out = new FileOutputStream(file);
                                         uriForFile = Uri.fromFile(file);
                                         MediaStore.Images.Media.getBitmap(showList.this.getContentResolver(), Uri.parse(thisimageuri))
@@ -552,10 +582,6 @@ public class showList extends AppCompatActivity {
                     return true;
                 }
             });
-
-            final TextView Ename = (TextView) v.findViewById(R.id.textView);
-            final CheckBox taken  = (CheckBox) v.findViewById(R.id.taken),returned = (CheckBox) v.findViewById(R.id.returned);
-            final ImageView Eimage = (ImageView) v.findViewById(R.id.imageView);
 
             /*taken.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -666,6 +692,13 @@ public class showList extends AppCompatActivity {
                 calendartemp.setTimeInMillis(Long.parseLong(data[1]));
                 hoteltime = sdf.format(calendartemp.getTime());
             }
+        }
+        private File createImageFile() throws IOException
+        {
+            String EName = "Image";
+            File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = File.createTempFile(EName, ".jpg", storageDir);
+            return image;
         }
 
     }

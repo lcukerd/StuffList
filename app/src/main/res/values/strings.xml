@@ -8,7 +8,7 @@
     <string name="action_review">Rate the app</string>
     <string name="action_log">Update Log</string>
 
-    <string name="order_title">Order By</string>
+    <string name="order_title">Sort By</string>
     <string name="order_date_asc">Last updated on bottom</string>
     <string name="order_date_desc">Last updated on top</string>
     <string name="order_name_asc">Alphabetically</string>
@@ -28,8 +28,11 @@
     <string name="about">More functionality and better UI will be added later as I learn. \n \nRemember, Remember the LCUKERD.
     </string>
     <string name="report">Found a bug or share an idea.</string>
-    <string name="log_disp">v1.4 \n1.Option to share item with other apps. \n2.FullScreen is more immersive. \n3.Ripple effect added on click. \nv1.3 \n1.Changed UI and color scheme for better visuals. \n2.Fixed algo that showed wrong info in the notification. \n3.Reduced time and duration of toasts. \n4.Added few Instructions. \nv1.2 \n1. Added option to store travel schedule. \n2. Notification to remind about items left an hour before departure from home and hotel. \n3. Added option to add note to items. \n4. Added instruction to swipe on starting screen. \n
-    v1.0 \nInitial Release
+    <string name="log_disp">v1.5 \n1.Changed UI for adding item.\n2.Option to rotate pic.\n3.Transitions and UI improvements.\n\n
+        v1.4 \n1.Option to share item with other apps. \n\n2.FullScreen is more immersive. \n3.Ripple effect added on click. \n\n
+        v1.3 \n1.Changed UI and color scheme for better visuals. \n2.Fixed algo that showed wrong info in the notification. \n3.Reduced time and duration of toasts. \n4.Added few Instructions. \n\n
+        v1.2 \n1. Added option to store travel schedule. \n2. Notification to remind about items left an hour before departure from home and hotel. \n3. Added option to add note to items. \n4. Added instruction to swipe on starting screen. \n\n
+        v1.0 \nInitial Release
     </string>
     <string name="title_activity_main">MainActivity</string>
 

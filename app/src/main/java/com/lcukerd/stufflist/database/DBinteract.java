@@ -137,7 +137,9 @@ public class DBinteract {
         ContentValues values = new ContentValues();
 
         if (Character.isAlphabetic(eventName.charAt(0)))
-            eventName = eventName.replace(eventName.charAt(0),Character.toUpperCase(eventName.charAt(0)));
+        {
+            eventName = Character.toUpperCase(eventName.charAt(0)) + eventName.substring(1);
+        }
         values.put(eventDBcontract.ListofItem.columnEvent,eventName);
         values.put(eventDBcontract.ListofItem.columnName,itemName);
         values.put(eventDBcontract.ListofItem.columndatetime,getmillis());

@@ -1,5 +1,6 @@
 package com.lcukerd.stufflist;
 /*
+Old Image not deleted
 pic disappears after switching app.
 add on screen button to go back
 Remove image from gallery
@@ -7,15 +8,14 @@ image not saved if rotated while closing camera
 */
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -27,7 +27,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,11 +35,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.lcukerd.stufflist.database.DBinteract;
@@ -49,11 +46,6 @@ import com.lcukerd.stufflist.database.eventDBcontract;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import static android.widget.RelativeLayout.ALIGN_BASELINE;
-import static android.widget.RelativeLayout.ALIGN_BOTTOM;
-import static android.widget.RelativeLayout.END_OF;
 
 public class addItem extends AppCompatActivity
 {
@@ -61,22 +53,18 @@ public class addItem extends AppCompatActivity
     private EditText Sname;
     private ImageButton Simage;
     private MenuItem taken, returned;
+    private static final String tag = addItem.class.getSimpleName();
 
-    private Bitmap photo = null;
     private static final int CAMERA_REQUEST = 1004;
     private static final int SELECT_FILE = 1005;
     private Context context = this;
+    private Bitmap photo = null;
     private Uri photoURI, photoURIc;
-    private Boolean updateImage = false, galleryused = false, deleteimageupdate = false, calledbylist = false;
-    private String eventName;
-    private Boolean camerastarted = false, showpopup = false;
-    private String ItemName;
+    private Boolean updateImage = false, galleryused = false, camerastarted = false, showpopup = false;
+    private String eventName, ItemName, caller, id, info[] = new String[5];
     private int t, r;
     private File photoFile;
-    private String caller;
     private Intent add;
-    private String id;
-    private String info[] = new String[5];
     private DBinteract interact = new DBinteract(this);
     private eventDBcontract dBcontract = new eventDBcontract(this);
 
@@ -93,24 +81,19 @@ public class addItem extends AppCompatActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setContentView(R.layout.activity_add_item);
 
         if (preferences.getBoolean("intialLaunchAdd", true))
         {
-            SQLiteDatabase db = dBcontract.getWritableDatabase();
-            Intent tutorial = new Intent(this, showPic.class);
+            /*Intent tutorial = new Intent(this, showPic.class);
             tutorial.putExtra("photo uri", "tutorial");
-            startActivity(tutorial);
+            startActivity(tutorial);*/
+            findViewById(R.id.instruction1).setVisibility(View.VISIBLE);
+            findViewById(R.id.instruction2).setVisibility(View.VISIBLE);
             Toast delpic = Toast.makeText(this, "Some phones save copy of image taken from app in gallery, You can safely delete it from there. ", Toast.LENGTH_LONG);
             delpic.show();
             preferences.edit().putBoolean("intialLaunchAdd", false).commit();
         }
-    }
-
-    protected void onStart()                                                                        //Delete photoUri in ondestroy if not clicked on either button
-    {
-        super.onStart();
-
-        setContentView(R.layout.activity_add_item);
 
         Toolbar toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
         toolbarBottom.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener()
@@ -129,6 +112,16 @@ public class addItem extends AppCompatActivity
         taken = toolbarBottom.getMenu().findItem(R.id.item_taken);
         returned = toolbarBottom.getMenu().findItem(R.id.item_back);
 
+        CreateView();
+    }
+
+    private void CreateView()
+    {
+        Sname.setText("");
+        Simage.setImageBitmap(null);
+        taken.setChecked(false);
+        returned.setChecked(false);
+
         if (caller.equals("list"))
         {
             info = add.getStringArrayExtra("available data");
@@ -145,10 +138,9 @@ public class addItem extends AppCompatActivity
             {
                 try
                 {
-                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(info[3]));
+                    photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(info[3]));
                     Simage.setImageBitmap(photo);
                     showpopup = true;
-                    calledbylist = true;
                 } catch (IOException e)
                 {
                     e.printStackTrace();
@@ -157,8 +149,6 @@ public class addItem extends AppCompatActivity
             id = info[4];
 
         }
-
-
         Simage.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -215,7 +205,7 @@ public class addItem extends AppCompatActivity
                                     photoURI = null;
                                 }
 
-                                recreate();
+                                CreateView();
                             }
                         });
 
@@ -294,59 +284,71 @@ public class addItem extends AppCompatActivity
             try
             {
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                if (galleryused = false)
+                photo = Bitmap.createScaledBitmap(photo, (2 * photo.getWidth()) / 3, (2 * photo.getHeight()) / 3, true);
+                saveandchangePic();
+            } catch (IOException e)
+            {
+                Log.e(tag, "Error reading uri", e);
+            }
+        }
+    }
+
+    private void saveandchangePic()
+    {
+        try
+        {
+            if (galleryused == false && photoFile != null)
+            {
+                photoFile.delete();
+            }
+            new Thread(new Runnable()
+            {
+                public void run()
                 {
-                    photoFile.delete();
-                }
-                new Thread(new Runnable() {
-                    public void run() {
-                        FileOutputStream out = null;
+                    FileOutputStream out = null;
+                    try
+                    {
+                        File image = createImageFile();
+                        photoURI = FileProvider.getUriForFile(context, "lcukerd.com.android.fileprovider", image);
+                        out = new FileOutputStream(image);
+                        photo.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    } finally
+                    {
                         try
                         {
-                            File image = createImageFile();
-                            photoURI = FileProvider.getUriForFile(context, "lcukerd.com.android.fileprovider", image);
-                            out = new FileOutputStream(image);
-                            deleteimageupdate = false;
-                            photo.compress(Bitmap.CompressFormat.PNG, 100, out);
-                        } catch (Exception e)
+                            if (out != null)
+                            {
+                                out.close();
+                            }
+                        } catch (IOException e)
                         {
                             e.printStackTrace();
-                        } finally
-                        {
-                            try
-                            {
-                                if (out != null)
-                                {
-                                    out.close();
-                                }
-                            } catch (IOException e)
-                            {
-                                e.printStackTrace();
-                            }
                         }
                     }
-                }).start();
+                }
+            }).start();
 
-                Simage.setImageBitmap(photo);
-                Sname.setText(ItemName);
-                if (t == 1)
-                    taken.setChecked(true);
-                else
-                    taken.setChecked(false);
-                if (r == 1)
-                    returned.setChecked(true);
-                else
-                    returned.setChecked(false);
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-            updateImage = false;
-            galleryused = false;
+            Simage.setImageBitmap(photo);
+            Sname.setText(ItemName);
+            if (t == 1)
+                taken.setChecked(true);
+            else
+                taken.setChecked(false);
+            if (r == 1)
+                returned.setChecked(true);
+            else
+                returned.setChecked(false);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
-
-
+        updateImage = false;
+        galleryused = false;
     }
+
 
     private void deleteimage(String imageloc)
     {
@@ -414,7 +416,7 @@ public class addItem extends AppCompatActivity
         if (caller.equals("list"))
         {
             menu.findItem(R.id.action_done).setTitle("update")
-                .setIcon(R.drawable.ic_update_white_24dp);
+                    .setIcon(R.drawable.ic_save_white_24dp);
             menu.findItem(R.id.action_done_all).setVisible(false);
         }
         return true;
@@ -439,16 +441,32 @@ public class addItem extends AppCompatActivity
             taken.setChecked(false);
             returned.setChecked(false);
             if (caller.equals("main"))
-                recreate();
+                CreateView();
             else
+            {
+                showList.recreateActivity = true;
                 finish();
+            }
+            Toast.makeText(context, "Item added", Toast.LENGTH_SHORT).show();
         } else if (menuid == R.id.action_done_all)
         {
             interact.save(eventName, Sname.getText().toString(), taken, returned, photoURI, caller, id);
             photoURI = null;
             camerastarted = false;
+            showList.recreateActivity = true;
+            Toast.makeText(context, "Item added", Toast.LENGTH_SHORT).show();
             finish();
+        } else if (menuid == R.id.action_rotate)
+        {
+            if (photoURI != null)
+                deleteimage(photoURI.toString());
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(), photo.getHeight(), matrix, true);
+            saveandchangePic();
         }
+        findViewById(R.id.instruction1).setVisibility(View.GONE);
+        findViewById(R.id.instruction2).setVisibility(View.GONE);
         return super.onOptionsItemSelected(item);
     }
 }

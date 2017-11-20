@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
         {
@@ -108,14 +109,14 @@ public class MainActivity extends AppCompatActivity
         {
             SQLiteDatabase db = dBcontract.getWritableDatabase();
             values = new ContentValues();
-            values.put(eventDBcontract.ListofItem.columnEvent,"Titorizl");
-            db.insert(eventDBcontract.ListofItem.tableName,null,values);
             String itemnames[] = {"Headphone","Shoes","Sunglasses","Towel","Scarf","First aid kit","Charger","Laptop","Comb"};
             for (int i=0;i<9;i++) {
                 values = new ContentValues();
                 adddummyitem(itemnames[i], i % 2, i % 3, R.drawable.d1 + i);
                 db.insert(eventDBcontract.ListofItem.tableName, null, values);
             }
+            preferences.edit().putBoolean("intialLaunchAdd", true).commit();
+            preferences.edit().putBoolean("intialLaunchG", true).commit();
             startActivity(new Intent(this,IntroActivity.class));
         }
         else if (id == R.id.about)

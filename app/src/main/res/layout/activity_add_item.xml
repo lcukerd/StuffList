@@ -23,6 +23,7 @@
         android:layout_above="@+id/relativeLayout"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:transitionName="commonimage"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
         app:srcCompat="@drawable/ic_insert_photo_black_48dp"/>
@@ -56,5 +57,27 @@
             />
 
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/instruction1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout"
+        android:layout_marginBottom="22dp"
+        android:layout_toEndOf="@+id/textView6"
+        android:text="Tap on below 3 dots to mark if you have already packed this item for jorney or return or both. "
+        android:textSize="10sp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/instruction2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/textView6"
+        android:layout_marginStart="118dp"
+        android:text="Tap on double tick to add this item or tap on single tick to add this + more items"
+        android:textSize="10sp"
+        android:visibility="gone"/>
 
 </RelativeLayout>
