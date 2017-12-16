@@ -1,4 +1,4 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,12 +18,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.lcukerd.stufflist.R;
+
 public class showPic extends AppCompatActivity {
 
     private ImageView pic;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_show_pic);
@@ -39,33 +42,21 @@ public class showPic extends AppCompatActivity {
         Intent intent = getIntent();
         String data = intent.getStringExtra("photo uri");
         pic = (ImageView) findViewById(R.id.imageView);
-        if (data.equals("tutorial"))
-        {
-            pic.setBackgroundResource(R.drawable.tut_1);
-            pic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-        }
-        else
-        {
-            try {
+        try {
 
-                Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(data));
-                Log.d("Size of image", "width:"+photo.getWidth()+" height:"+photo.getHeight());
+            Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(data));
+            Log.d("Size of image", "width:" + photo.getWidth() + " height:" + photo.getHeight());
             /*if ((metrics.heightPixels>metrics.widthPixels)&&(photo.getHeight()<photo.getWidth()))
             {
                 th =(int) ( tw* ( ((float)photo.getHeight()) / ((float)photo.getWidth()) ));
                 Log.d("Metrics for landscape",String.valueOf(tw)+" "+String.valueOf(th));
             }*/
-                pic.setImageBitmap(photo);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("Couldn't Load",data);
-            }
+            pic.setImageBitmap(photo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Couldn't Load", data);
         }
+
     }
 
 }

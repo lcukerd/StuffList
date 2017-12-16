@@ -1,9 +1,11 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.preference;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+
+import com.lcukerd.stufflist.R;
 
 /**
  * Created by Programmer on 13-03-2017.

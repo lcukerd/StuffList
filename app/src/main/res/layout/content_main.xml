@@ -5,8 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e0e0e0"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.lcukerd.stufflist.MainActivity"
+    tools:context="com.lcukerd.stufflist.activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <TextView
@@ -18,11 +19,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="530dp"
         android:text="@string/tap_hold"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_event"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#e0e0e0"
+        android:layout_height="wrap_content"
         >
 
     </android.support.v7.widget.RecyclerView>

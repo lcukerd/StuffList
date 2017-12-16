@@ -131,10 +131,11 @@ public class DBinteract {
         return 0;
     }
 
-    public void save(String eventName, String itemName, MenuItem taken, MenuItem returned, Uri photoURI , String caller , String id)
+    public long save(String eventName, String itemName, MenuItem taken, MenuItem returned, Uri photoURI , String caller , String id)
     {
         SQLiteDatabase db = dBcontract.getWritableDatabase();
         ContentValues values = new ContentValues();
+        long specialid;
 
         if (Character.isAlphabetic(eventName.charAt(0)))
         {
@@ -143,14 +144,21 @@ public class DBinteract {
         values.put(eventDBcontract.ListofItem.columnEvent,eventName);
         values.put(eventDBcontract.ListofItem.columnName,itemName);
         values.put(eventDBcontract.ListofItem.columndatetime,getmillis());
-        if (taken.isChecked())
-            values.put(eventDBcontract.ListofItem.columntaken,"1");
+        if (taken != null) {
+            if (taken.isChecked())
+                values.put(eventDBcontract.ListofItem.columntaken, "1");
+            else
+                values.put(eventDBcontract.ListofItem.columntaken, "0");
+            if (returned.isChecked())
+                values.put(eventDBcontract.ListofItem.columnreturn, "1");
+            else
+                values.put(eventDBcontract.ListofItem.columnreturn, "0");
+        }
         else
-            values.put(eventDBcontract.ListofItem.columntaken,"0");
-        if (returned.isChecked())
-            values.put(eventDBcontract.ListofItem.columnreturn,"1");
-        else
-            values.put(eventDBcontract.ListofItem.columnreturn,"0");
+        {
+            values.put(eventDBcontract.ListofItem.columntaken, "0");
+            values.put(eventDBcontract.ListofItem.columnreturn, "0");
+        }
         if (photoURI!=null) {
             values.put(eventDBcontract.ListofItem.columnFileloc, photoURI.toString());
             Log.d("File address write", photoURI.toString());
@@ -159,13 +167,15 @@ public class DBinteract {
             values.putNull(eventDBcontract.ListofItem.columnFileloc);
         if (caller.equals("main"))
         {
-            db.insert(eventDBcontract.ListofItem.tableName,null,values);
+            specialid = db.insert(eventDBcontract.ListofItem.tableName,null,values);
             Log.d("save operation","complete");
+            return specialid;
         }
         else
         {
             db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
             Log.d("update operation","complete");
+            return 0;
         }
     }
 
@@ -181,8 +191,7 @@ public class DBinteract {
         if (end!=-1)
             values.put(eventDBcontract.ListofItem.columnreturn,end);
 
-        db.update(eventDBcontract.ListofItem.tableName,values,"id=?",new String[]{id});
-
+        db.update(eventDBcontract.ListofItem.tableName,values,"id = ?",new String[]{id});
         Log.d("save operation","Event detail complete");
     }
     public void savenote(String id , String note)

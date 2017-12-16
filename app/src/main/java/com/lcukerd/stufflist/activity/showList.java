@@ -1,4 +1,4 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.activity;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -50,8 +50,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.lcukerd.stufflist.R;
+import com.lcukerd.stufflist.about;
 import com.lcukerd.stufflist.database.DBinteract;
 import com.lcukerd.stufflist.database.eventDBcontract;
+import com.lcukerd.stufflist.notifier;
+import com.lcukerd.stufflist.preference.orderitem;
+import com.lcukerd.stufflist.updateLog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -366,7 +371,7 @@ public class showList extends AppCompatActivity {
 
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            Intent addItem = new Intent(getApplicationContext(),addItem.class);
+            Intent addItem = new Intent(getApplicationContext(), com.lcukerd.stufflist.activity.addItem.class);
             addItem.putExtra("eventName",data);
             addItem.putExtra("calledby","main");
             startActivity(addItem);
@@ -424,7 +429,7 @@ public class showList extends AppCompatActivity {
                 try {
 
                     Bitmap photo = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(data[2]));
-                    if (photo.getHeight()>photo.getWidth())
+                    if (photo.getHeight()>=photo.getWidth())
                         photo = Bitmap.createScaledBitmap(photo,metrics.widthPixels/3,metrics.heightPixels/3,false);
                     else
                         photo = Bitmap.createScaledBitmap(photo,metrics.heightPixels/3,metrics.widthPixels/3,false);
@@ -671,14 +676,14 @@ public class showList extends AppCompatActivity {
                 }
                 if (specialid==null)
                 {
-                    //interact.save(datat[5],"#%",new CheckBox(context),new CheckBox(context),null,"main","0");
+                    specialid = String.valueOf(interact.save(datat[5],"#%",null,null,null,"main","0"));
                 }
             }
         }
         protected void onCancelled(String data[])
         {
             notes.setText(data[3].substring(2));
-            final String myFormat = "h:mm a, EEE, d MMM yyyy";
+             final String myFormat = "h:mm a, EEE, d MMM yyyy";
             sdf = new SimpleDateFormat(myFormat);
             if (data[0].equals("0")==false)
             {

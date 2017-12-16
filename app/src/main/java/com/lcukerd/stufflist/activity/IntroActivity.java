@@ -1,4 +1,4 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.activity;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.lcukerd.stufflist.R;
 
 import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
 import static android.widget.RelativeLayout.ALIGN_PARENT_END;

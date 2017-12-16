@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import com.lcukerd.stufflist.activity.showList;
 import com.lcukerd.stufflist.database.DBinteract;
 import com.lcukerd.stufflist.database.eventDBcontract;
 

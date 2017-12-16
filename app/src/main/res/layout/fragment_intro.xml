@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:showIn="@layout/activity_intro"
-    tools:context="com.lcukerd.stufflist.IntroActivity$PlaceholderFragment">
+    tools:context="com.lcukerd.stufflist.activity.IntroActivity$PlaceholderFragment">
 
     <TextView
         android:id="@+id/heading"

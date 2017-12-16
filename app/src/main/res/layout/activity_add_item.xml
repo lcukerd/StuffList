@@ -5,7 +5,7 @@
     android:id="@+id/activity_add_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.lcukerd.stufflist.addItem">
+    tools:context="com.lcukerd.stufflist.activity.addItem">
 
     <TextView
         android:id="@+id/textView6"
@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="145dp"
-        android:text="Tap to add/change pic (optional)"/>
+        android:text="Tap to add/change pic (optional)\nTap and Hold to delete image"/>
 
     <ImageButton
         android:id="@+id/Simage"

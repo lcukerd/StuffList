@@ -1,4 +1,4 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.activity;
 /*
 Old Image not deleted
 pic disappears after switching app.
@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
@@ -40,6 +39,7 @@ import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.lcukerd.stufflist.R;
 import com.lcukerd.stufflist.database.DBinteract;
 import com.lcukerd.stufflist.database.eventDBcontract;
 
@@ -83,17 +83,18 @@ public class addItem extends AppCompatActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_add_item);
 
-        if (preferences.getBoolean("intialLaunchAdd", true))
-        {
+        if (!caller.equals("list"))
+            if (preferences.getBoolean("intialLaunchAdd", true))
+            {
             /*Intent tutorial = new Intent(this, showPic.class);
             tutorial.putExtra("photo uri", "tutorial");
             startActivity(tutorial);*/
-            findViewById(R.id.instruction1).setVisibility(View.VISIBLE);
-            findViewById(R.id.instruction2).setVisibility(View.VISIBLE);
-            Toast delpic = Toast.makeText(this, "Some phones save copy of image taken from app in gallery, You can safely delete it from there. ", Toast.LENGTH_LONG);
-            delpic.show();
-            preferences.edit().putBoolean("intialLaunchAdd", false).commit();
-        }
+                findViewById(R.id.instruction1).setVisibility(View.VISIBLE);
+                findViewById(R.id.instruction2).setVisibility(View.VISIBLE);
+                Toast delpic = Toast.makeText(this, "Some phones save copy of image taken from app in gallery, You can safely delete it from there. ", Toast.LENGTH_LONG);
+                delpic.show();
+                preferences.edit().putBoolean("intialLaunchAdd", false).commit();
+            }
 
         Toolbar toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
         toolbarBottom.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener()

@@ -1,4 +1,4 @@
-package com.lcukerd.stufflist;
+package com.lcukerd.stufflist.activity;
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,8 +26,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.lcukerd.stufflist.EventListAdapter;
+import com.lcukerd.stufflist.R;
+import com.lcukerd.stufflist.about;
 import com.lcukerd.stufflist.database.DBinteract;
 import com.lcukerd.stufflist.database.eventDBcontract;
+import com.lcukerd.stufflist.preference.orderevent;
+import com.lcukerd.stufflist.updateLog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -109,8 +113,8 @@ public class MainActivity extends AppCompatActivity
         {
             SQLiteDatabase db = dBcontract.getWritableDatabase();
             values = new ContentValues();
-            String itemnames[] = {"Headphone","Shoes","Sunglasses","Towel","Scarf","First aid kit","Charger","Laptop","Comb"};
-            for (int i=0;i<9;i++) {
+            String itemnames[] = {"Headphone","Blanket","Watch","Towel","Camera","Shoes","Guitar"};
+            for (int i=0;i<7;i++) {
                 values = new ContentValues();
                 adddummyitem(itemnames[i], i % 2, i % 3, R.drawable.d1 + i);
                 db.insert(eventDBcontract.ListofItem.tableName, null, values);
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity
                 imm.hideSoftInputFromWindow(nameOfEvent.getWindowToken(), 0);
                 dialog.dismiss();
 
-                Intent addItem = new Intent(getApplicationContext(),addItem.class);
+                Intent addItem = new Intent(getApplicationContext(), com.lcukerd.stufflist.activity.addItem.class);
                 addItem.putExtra("eventName",newEntry);
                 addItem.putExtra("calledby","main");
                 startActivity(addItem);
